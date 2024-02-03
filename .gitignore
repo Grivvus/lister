@@ -1,0 +1,8 @@
+__pycache__/
+venv/
+.vscode/
+.idea/
+chat_info.txt
+res.txt
+*.html
+settings.py
