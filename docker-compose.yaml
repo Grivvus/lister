@@ -3,8 +3,11 @@ version: '1'
 services:
   db:
     image: postgres
+    volumes:
+      - /var/lib/docker/volumes/project_x_db_data:/var/lib/postgresql/data
     restart: always
     ports:
       - 5432:5432
     environment:
+      PGDATA: /var/lib/postgresql/data/postgres_data/
       POSTGRES_PASSWORD: hackme
