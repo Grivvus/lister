@@ -5,30 +5,89 @@ from telebot import types
 from telebot.callback_data import CallbackData
 import requests
 
+from bot_utils import BASE_URL, check_for_permition
 import settings
 
-BASE_URL = "http://127.0.0.1:8000"
-HELP_TEXT = ""
+HELP_TEXT = "This bot called upon to structure your list of games, you want \
+to play, books, you want to read, movies, you want to watch. \
+There are some commands to interact with bot. \n\n\
+/start - command to start communication with bot, \n\
+/help - command that sending this text, \n\
+/get_all_games(get_all_books, get_all_movies) - \
+command that sending your list of games(books, movies) in priority order, \n\
+/add_game(add_book, add_movie) - command to add game(book, movie) to your \
+list, \n/pop_game(pop_book, pop_movie) - command that returns upper element\
+and change it status at 'in progress' - means that you start to play this \
+game(read book,etc...)"
+
 bot = telebot.TeleBot(token=settings.TOKEN)
 
 @bot.message_handler(commands=["start"])
 def start(message: types.Message):
-    print(message.chat)
     bot.send_message(message.chat.id, "Hello there")
     bot.send_message(message.chat.id, HELP_TEXT)
 
 @bot.message_handler(commands=["help", "commands"])
 def help(message: types.Message):
     bot.send_message(message.chat.id, HELP_TEXT)
+
+
+@bot.message_handler(commands=["get_all_games"])
+def get_all_games(message: types.Message):
+    r = requests.get(url=f"{BASE_URL}/get_games_list/{message.chat.id}")
+    if r.status_code == 200:
+        s = ""
+        resp = r.json()
+        for i in resp:
+            s += f"{resp[i]['title']} {resp[i]['link']} " +\
+                f"{resp[i]['priority']} {resp[i]['status']} \n"
+        bot.send_message(message.chat.id, s)
+    else:
+        bot.send_message(message.chat.id,
+                         "Unexpected error, request return"\
+                         + f"status {r.status_code}"
+        )
+
+@bot.message_handler(commands=["get_all_movies"])
+def get_all_movies(message: types.Message):
+    r = requests.get(url=f"{BASE_URL}/get_movies_list/{message.chat.id}")
+    if r.status_code == 200:
+        s = ""
+        resp = r.json()
+        for i in resp:
+            s += f"{resp[i]['title']} {resp[i]['link']} " +\
+                f"{resp[i]['priority']} {resp[i]['status']} \n"
+        bot.send_message(message.chat.id, s)
+    else:
+        bot.send_message(message.chat.id,
+                         "Unexpected error, request return"\
+                         + f"status {r.status_code}"
+        )
+
+@bot.message_handler(commands=["get_all_books"])
+def get_all_books(message: types.Message):
+    r = requests.get(url=f"{BASE_URL}/get_books_list/{message.chat.id}")
+    if r.status_code == 200:
+        s = ""
+        resp = r.json()
+        for i in resp:
+            s += f"{resp[i]['author']} {resp[i]['title']} {resp[i]['link']} "+\
+                f"{resp[i]['priority']} {resp[i]['status']} \n"
+        bot.send_message(message.chat.id, s)
+    else:
+        bot.send_message(message.chat.id,
+                         "Unexpected error, request return"\
+                         + f"status {r.status_code}"
+        )
+
+
 @bot.message_handler(commands=["add_book"])
 def add_book(message: types.Message):
     data: list[str] = message.text.split()
 
-
 @bot.message_handler(commands=["add_game"])
 def add_game(message: types.Message):
     data: list[str] = message.text.split()
-
 
 @bot.message_handler(commands=["add_movie"])
 def add_movie(message: types.Message):
@@ -56,24 +115,41 @@ def add_movie(message: types.Message):
         )
 
 
-# @bot.message_handler(commands=["add"])
-# def add_item(message: types.Message):
-#     bot.send_message(
-#         message.chat.id,
-#         text= "Which type of content do you want to add",
-#         reply_markup=bot_utils.generate_buttons_markup()
-#     )
+@bot.message_handler(commands=["pop_game"])
+def pop_game(message: types.Message):
+    r = requests.get(url=f"{BASE_URL}/pop_game/{message.chat.id}")
+    if r.status_code == 200:
+        resp = r.json()
+        bot.send_message(f"you took game {resp['title']} to play")
+    else:
+        bot.send_message(message.chat.id,
+                         "Unexpected error, request return"\
+                         + f"status {r.status_code}"
+        )
 
+@bot.message_handler(commands=["pop_book"])
+def pop_book(message: types.Message):
+    r = requests.get(url=f"{BASE_URL}/pop_book/{message.chat.id}")
+    if r.status_code == 200:
+        resp = r.json()
+        bot.send_message(f"you took book {resp['title']} to read")
+    else:
+        bot.send_message(message.chat.id,
+                         "Unexpected error, request return"\
+                         + f"status {r.status_code}"
+        )
 
-# не работающая шляпа
-# @bot.callback_query_handler(func=lambda param: True)
-# def callback_query(call: types.CallbackQuery):
-#     if call.data == "book":
-#         bot.send_message(call.from_user.id, "add book to db")
-#     elif call.data == "movie":
-#         bot.send_message(call.from_user.id, "add movie to db")
-#     elif call.data == "game":
-#         bot.send_message(call.from_user.id, "add game to db")
+@bot.message_handler(commands=["pop_movie"])
+def pop_movie(message: types.Message):
+    r = requests.get(url=f"{BASE_URL}/pop_movie/{message.chat.id}")
+    if r.status_code == 200:
+        resp = r.json()
+        bot.send_message(f"you took movie {resp['title']} to watch")
+    else:
+        bot.send_message(message.chat.id,
+                         "Unexpected error, request return"\
+                         + f"status {r.status_code}"
+        )
 
 
 bot.infinity_polling()
