@@ -3,6 +3,7 @@ version: '1'
 services:
   db:
     image: postgres
+    command: ["postgres", "-c", "log_statement=all"]
     volumes:
       - /var/lib/docker/volumes/project_x_db_data:/var/lib/postgresql/data
     restart: always
