@@ -22,7 +22,7 @@ class Book(Base):
     title: Mapped[str] = mapped_column(String(50))
     author: Mapped[str] = mapped_column(String(), nullable=True)
     link: Mapped[str] = mapped_column(String(), nullable=True)
-    # pririty is number between 1 and 3, 1 - most wanted, 3 - less wanted
+    # priority is number between 1 and 3, 1 - most wanted, 3 - less wanted
     priority: Mapped[int] = mapped_column(Integer(), default=3)
     # there's 3 statuses: o - opened, c - closed, p - in progress
     status: Mapped[str] = mapped_column(String(1), default="o")
@@ -56,7 +56,7 @@ class Game(Base):
     user_id: Mapped[int] = mapped_column(Integer())
     title: Mapped[str] = mapped_column(String(50))
     link: Mapped[str] = mapped_column(String())
-    # pririty is number between 1 and 3, 1 - most wanted, 3 - less wanted
+    # priority is number between 1 and 3, 1 - most wanted, 3 - less wanted
     priority: Mapped[int] = mapped_column(Integer(), default=3)
     # there's 3 statuses: o - opened, c - closed, p - in progress
     status: Mapped[str] = mapped_column(String(1), default="o")
@@ -85,7 +85,7 @@ class Movie(Base):
     user_id: Mapped[int] = mapped_column(Integer())
     title: Mapped[str] = mapped_column(String(50))
     link: Mapped[str] = mapped_column(String())
-    # pririty is number between 1 and 3, 1 - most wanted, 3 - less wanted
+    # priority is number between 1 and 3, 1 - most wanted, 3 - less wanted
     priority: Mapped[int] = mapped_column(Integer())
     # there's 3 statuses: o - opened, c - closed, p - in progress
     status: Mapped[str] = mapped_column(String(1), default="o")

@@ -38,6 +38,8 @@ def get_all_games(message: types.Message):
     if r.status_code == 200:
         s = ""
         resp = r.json()
+        if not resp:
+            bot.send_message(message.chat.id, "empty")
         for i in resp:
             s += f"{resp[i]['title']} {resp[i]['link']} " +\
                 f"{resp[i]['priority']} {resp[i]['status']} \n"
@@ -54,6 +56,8 @@ def get_all_movies(message: types.Message):
     if r.status_code == 200:
         s = ""
         resp = r.json()
+        if not resp:
+            bot.send_message(message.chat.id, "empty")
         for i in resp:
             s += f"{resp[i]['title']} {resp[i]['link']} " +\
                 f"{resp[i]['priority']} {resp[i]['status']} \n"
@@ -70,6 +74,8 @@ def get_all_books(message: types.Message):
     if r.status_code == 200:
         s = ""
         resp = r.json()
+        if not resp:
+            bot.send_message(message.chat.id, "empty")
         for i in resp:
             s += f"{resp[i]['author']} {resp[i]['title']} {resp[i]['link']} "+\
                 f"{resp[i]['priority']} {resp[i]['status']} \n"
@@ -83,27 +89,19 @@ def get_all_books(message: types.Message):
 
 @bot.message_handler(commands=["add_book"])
 def add_book(message: types.Message):
-    data: list[str] = message.text.split()
+    raw_data: list[str] = message.text.split()
 
 @bot.message_handler(commands=["add_game"])
 def add_game(message: types.Message):
-    data: list[str] = message.text.split()
+    raw_data: list[str] = message.text.split()
 
 @bot.message_handler(commands=["add_movie"])
 def add_movie(message: types.Message):
-    data_raw: list[str] = message.text.split()
+    raw_data: list[str] = message.text.split()
     data: dict = {}
-    try:
-        data["title"] = data_raw[1]
-        try:
-            data["link"] = data_raw[2]
-        except IndexError:
-            pass
-    except Exception as e:
-        print(e)
-        bot.send_message(message.chat.id, f"Ошибка при добавлении фильма {e}")
-    print(data)
-    r = requests.post(f"{BASE_URL}/add_movie/{message.chat.id}", data=json.dumps(data))
+    r = requests.post(
+        f"{BASE_URL}/add_movie/{message.chat.id}", data=json.dumps(data)
+    )
     if r.status_code == 200:
         bot.send_message(message.chat.id,
                          f"Movie {data['title']} succesfully added"
@@ -150,6 +148,19 @@ def pop_movie(message: types.Message):
                          "Unexpected error, request return"\
                          + f"status {r.status_code}"
         )
+
+
+@bot.message_handler(commands=["delete_game"])
+def delete_game(message: types.Message):
+    ...
+
+@bot.message_handler(commands=["delete_book"])
+def delete_book(message: types.Message):
+    ...
+
+@bot.message_handler(commands=["delete_movie"])
+def delete_movie(message: types.Message):
+    ...
 
 
 bot.infinity_polling()

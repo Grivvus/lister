@@ -2,7 +2,7 @@ import json
 
 import requests
 
-BASE_URL = "http://127.0.0.1:8000"
+BASE_URL = "http://127.0.0.1:8000/api"
 
 def check_for_permition(user_id: int, obj_id: int, obj_type: str):
     if obj_type not in ["book", "game", "movie"]:
