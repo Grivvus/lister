@@ -1,9 +1,6 @@
 __pycache__/
-alembic/
 venv/
 .vscode/
 .idea/
-chat_info.txt
-res.txt
 *.html
-settings.py
+.env
