@@ -31,8 +31,13 @@ services:
       - ./backend:/app/
     restart: on-failure
 
-  # bot:
-  #   build:
-  #     context: ./tg_bot/ 
-  #   container_name: lister_bot
-  #   restart: on-failure
+  bot:
+    build:
+      context: ./tg_bot/ 
+    container_name: lister_bot
+    command: "python src/main.py"
+    volumes:
+      - ./tg_bot/:/app/
+    env_file:
+      - ./.env 
+    restart: on-failure
