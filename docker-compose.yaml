@@ -1,20 +1,20 @@
 services:
-  db:
-    image: postgres
-    restart: on-failure
-    environment:
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_DB: ${POSTGRES_DB}
-    volumes:
-      - ~/docker_volumes/postgres/lister_db:/var/lib/postgresql/data
-    ports:
-      - 5432:5432
-    healthcheck:
-      test: [ "CMD", "pg_isready" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+  # db:
+  #   image: postgres
+  #   restart: on-failure
+  #   environment:
+  #     POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+  #     POSTGRES_USER: ${POSTGRES_USER}
+  #     POSTGRES_DB: ${POSTGRES_DB}
+  #   volumes:
+  #     - ~/docker_volumes/postgres/lister_db:/var/lib/postgresql/data
+  #   ports:
+  #     - 5432:5432
+  #   healthcheck:
+  #     test: [ "CMD", "pg_isready" ]
+  #     interval: 10s
+  #     timeout: 5s
+  #     retries: 5
 
   backend:
     build: 
@@ -23,11 +23,12 @@ services:
     environment:
       PORT: 8000
     ports:
-      - '8000:8000'
-    env-file:
+      - "8000:8000"
+    command: "sh /app/scripts/startapp.sh"
+    env_file:
       - ./.env
-    docker_volumes:
-      - ./backend/:/app/
+    volumes:
+      - ./backend:/app/
     restart: on-failure
 
   # bot:

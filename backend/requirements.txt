@@ -1,5 +1,5 @@
-alembic ^1.8.1
-django-environ ^ 0.11.2
-fastapi ^0.103.0
-psycopg2 ^2.9.9
-sqlalchemy ^2.0.25
+alembic>=1.8.1
+django-environ>= 0.11.2
+fastapi>=0.103.0
+psycopg2>=2.9.9
+sqlalchemy>=2.0.25
