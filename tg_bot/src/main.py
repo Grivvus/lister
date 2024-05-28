@@ -2,11 +2,11 @@ import asyncio
 
 import telegram
 
-from utils import get_bot_token
+from settings import settings
 
 
 async def main():
-    bot = telegram.Bot(get_bot_token())
+    bot = telegram.Bot(settings.BOT_TOKEN)
     async with bot:
         print(await bot.get_me())
 
