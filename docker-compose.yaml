@@ -7,10 +7,9 @@ services:
       PORT: 8000
     ports:
       - "8000:8000"
-    # command: "sh /app/scripts/startapp.sh"
-    command: "python app/main.py"
-    # env_file:
-    #   - ./backend/.env
+    command: "sh /app/scripts/start.sh"
+    env_file:
+      - ./backend/.env
     volumes:
       - ./backend:/app/
     restart: on-failure
