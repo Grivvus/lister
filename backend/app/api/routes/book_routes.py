@@ -37,17 +37,15 @@ def add_book():
 
 @router.delete("/remove_book")
 def remove_book():
-    # there's no id, don't know how to inentify book to delete
     """
-    removing book by ???
+    removing book by name
     """
     raise NotImplementedError("not done yet")
 
 
 @router.put("/change_book")
 def change_book():
-    # exact same problem as with delete
     """
-    changing book fields
+    changing book fields (identifying by name)
     """
     raise NotImplementedError("not done yet")
