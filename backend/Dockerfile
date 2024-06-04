@@ -12,6 +12,4 @@ ENV PYTHONPATH=/app
 
 COPY . /app/
 
-# переделаю в будущем на poetry
-RUN pip install -r requirements.txt
-
+RUN poetry install --no-root

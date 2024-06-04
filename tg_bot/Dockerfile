@@ -8,7 +8,6 @@ RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python
     ln -s /opt/poetry/bin/poetry && \
     poetry config virtualenvs.create false
 
-COPY . /app/
+COPY . /app
 
-# переделаю в будущем на poetry
-RUN pip install -r requirements.txt
+RUN poetry install --no-root

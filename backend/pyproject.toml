@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "lister-backend"
+version = "0.1.0"
+description = "backend api for the lister project"
+authors = ["Arseniy Krupchik <kruchik.a04@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+beanie = "^1.26.0"
+fastapi = "^0.103.0"
+motor = "^3.4.0"
+pydantic-settings = "^2.2.1"
+uvicorn = "^0.30.1"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
