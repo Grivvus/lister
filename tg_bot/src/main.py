@@ -2,29 +2,16 @@ import asyncio
 import logging
 import sys
 
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
-from aiogram.types import Message, ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import Message, CallbackQuery
 
 from constants import WELCOME_TEXT, HELP_TEXT
+from callback_queries import *
+from keyboards import make_kb_for_start, get_first_level_inline_keyboard
 from settings import settings
 
 dp = Dispatcher()
-
-
-def make_kb_for_start():
-    kb = [
-        [KeyboardButton(text="/Books")],
-        [KeyboardButton(text="/Games")],
-        [KeyboardButton(text="/Movies")],
-        [KeyboardButton(text="/help")],
-    ]
-
-    keyboard = ReplyKeyboardMarkup(
-        keyboard=kb, resize_keyboard=True,
-        input_field_placeholder="what's your target"
-    )
-    return keyboard
 
 
 @dp.message(Command("start", ignore_case=True))
@@ -53,7 +40,12 @@ async def books_handler(message: Message):
     """
     docs will be here
     """
-    raise NotImplementedError()
+    builder_kb = get_first_level_inline_keyboard("books")
+
+    await message.answer(
+        "Какое действие вы хотите произвести?",
+        reply_markup=builder_kb.as_markup()
+    )
 
 
 @dp.message(Command("games", ignore_case=True))
@@ -61,7 +53,12 @@ async def games_handler(message: Message):
     """
     docs will be here
     """
-    raise NotImplementedError()
+    builder_kb = get_first_level_inline_keyboard("games")
+
+    await message.answer(
+        "Какое действие вы хотите произвести?",
+        reply_markup=builder_kb.as_markup()
+    )
 
 
 @dp.message(Command("movies", ignore_case=True))
@@ -69,7 +66,66 @@ async def movies_handler(message: Message):
     """
     docs will be here
     """
-    raise NotImplementedError()
+    builder_kb = get_first_level_inline_keyboard("movies")
+
+    await message.answer(
+        "Какое действие вы хотите произвести?",
+        reply_markup=builder_kb.as_markup()
+    )
+
+
+@dp.callback_query(F.data.endswith("book"))
+async def book_query_handler(callback: CallbackQuery):
+    if callback.data.startswith("add"):
+        add_book_query(callback)
+    elif callback.data.startswith("change"):
+        change_book_query(callback)
+    elif callback.data.startswith("del"):
+        del_book_query(callback)
+    elif callback.data.startswith("read_all"):
+        read_all_book_query(callback)
+    elif callback.data.startswith("pop"):
+        pop_book_query(callback)
+    else:
+        await callback.message.edit_text("unkown command")
+
+    await callback.answer()
+
+
+@dp.callback_query(F.data.endswith("game"))
+async def game_query_handler(callback: CallbackQuery):
+    if callback.data.startswith("add"):
+        add_game_query(callback)
+    elif callback.data.startswith("change"):
+        change_game_query(callback)
+    elif callback.data.startswith("del"):
+        del_game_query(callback)
+    elif callback.data.startswith("read_all"):
+        read_all_game_query(callback)
+    elif callback.data.startswith("pop"):
+        pop_game_query(callback)
+    else:
+        await callback.message.edit_text("unkown command")
+
+    await callback.answer()
+
+
+@dp.callback_query(F.data.endswith("movie"))
+async def movie_query_handler(callback: CallbackQuery):
+    if callback.data.startswith("add"):
+        add_movie_query(callback)
+    elif callback.data.startswith("change"):
+        change_movie_query(callback)
+    elif callback.data.startswith("del"):
+        del_movie_query(callback)
+    elif callback.data.startswith("read_all"):
+        read_all_movie_query(callback)
+    elif callback.data.startswith("pop"):
+        pop_movie_query(callback)
+    else:
+        await callback.message.edit_text("unkown command")
+
+    await callback.answer()
 
 
 async def main():
