@@ -6,7 +6,7 @@ from app.api.main import api_router
 def fastapi_factory():
     api_instance = FastAPI(
         debug=True, title="lister",
-        docs_url="/", version="0.1.0"
+        docs_url="/", version="0.1.0",
     )
     api_instance.include_router(api_router, prefix="/api")
 

@@ -13,7 +13,7 @@ class GenericItem(Document):
     rate: int | None
     review: str | None
     add_time: datetime.datetime
-    change_time: datetime.datetime
+    change_time: datetime.datetime | None
 
 
 class Book(GenericItem):

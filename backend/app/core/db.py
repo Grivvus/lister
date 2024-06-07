@@ -16,3 +16,12 @@ async def init_db():
             Book, Game, Movie
         ]
     )
+
+    return client
+
+
+async def ping():
+    client = init_db()
+    res = await client.command("ping")
+
+    return res
