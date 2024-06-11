@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Body
 
 from app.models import Book, Game, Movie
 from app.logic import books_logic
@@ -8,11 +8,11 @@ router = APIRouter()
 
 
 @router.get("/")
-def get_all_books():
+async def get_all_books():
     """
     returns all books
     """
-    return books_logic.get_all_books()
+    return await books_logic.get_all_books()
 
 
 @router.get("/get_books_in_rate_order")
@@ -24,32 +24,33 @@ def get_books_in_rate_order():
 
 
 @router.get("/pop_book")
-def pop_book():
+async def pop_book():
     """
     returns book with highest rate that not read yet
     """
-    return books_logic.pop_book()
+    return await books_logic.pop_book()
 
 
 @router.post("/add_book")
-def add_book(book_data: Book):
+async def add_book(book_data: Book = Body(embed=True)):
     """
     add new book to db
     """
-    return books_logic.add_book(book_data)
+    print(book_data)
+    return await books_logic.add_book(book_data)
 
 
 @router.delete("/remove_book/{book_name}")
-def remove_book(book_name: str):
+async def remove_book(book_name: str):
     """
     removing book by name
     """
-    return books_logic(book_name)
+    return await books_logic.remove_book(book_name)
 
 
 @router.put("/change_book")
-def change_book():
+async def change_book():
     """
     changing book fields (identifying by name)
     """
-    return books_logic.change_book()
+    return await books_logic.change_book()

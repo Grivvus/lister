@@ -25,11 +25,11 @@ async def add_book(book_data: Book):
         rate=book_data.rate,
         review=book_data.review,
         add_time=book_data.add_time,
-        change_time=book_data.change_time
+        change_time=book_data.change_time,
+        author=book_data.author,
+        book_genre=book_data.book_genre
     )
-    new_book.insert()
-
-    return True
+    return await new_book.insert()
 
 
 async def remove_book(book_name: str):

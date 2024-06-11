@@ -1,16 +1,21 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
 from app.api.main import api_router
+from app.core.db import start_async_mongodb
 
 
-def fastapi_factory():
-    api_instance = FastAPI(
+app = FastAPI(
         debug=True, title="lister",
         docs_url="/", version="0.1.0",
     )
-    api_instance.include_router(api_router, prefix="/api")
+app.include_router(api_router, prefix="/api")
 
-    return api_instance
+
+@app.on_event("startup")
+async def startup_event():
+    await start_async_mongodb()
 
 
 if __name__ == "__main__":
