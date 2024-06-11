@@ -8,7 +8,6 @@ class GenericItem(Document):
     model that represents generic item in  db
     """
     name: Indexed(str)
-    user: Indexed(int)
     status: str  # надо бы сделать типо enum [not_sarted, in_progress, finished] smth like that
     rate: int | None
     review: str | None
