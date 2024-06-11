@@ -13,8 +13,7 @@ services:
     volumes:
       - ./backend:/app/
     depends_on:
-      mongodb:
-        condition: service_healthy
+      - mongodb
     restart: on-failure
 
   bot:
@@ -39,19 +38,13 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
     ports:
       - 27017:27017
-    healthcheck:
-      test: echo 'db.runCommand({serverStatus:1}).ok' | mongo admin -u $MONGO_INITDB_ROOT_USERNAME -p $MONGO_INITDB_ROOT_PASSWORD --quiet | grep 1
-      interval: 10s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
+
     restart: on-failure
   
   mongo-express:
     image: mongo-express
     depends_on:
-      mongodb:
-        condition: service_healthy
+      - mongodb
     ports:
       - 8081:8081
     env_file:
@@ -59,5 +52,5 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_INITDB_ROOT_USERNAME}
       ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_INITDB_ROOT_PASSWORD}
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongo:27017/
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_INITDB_ROOT_USERNAME}:${MONGO_INITDB_ROOT_PASSWORD}@mongodb:27017/
       ME_CONFIG_BASICAUTH: false
