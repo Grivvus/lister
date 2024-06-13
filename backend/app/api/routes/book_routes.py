@@ -1,6 +1,6 @@
-from fastapi import APIRouter, Body
+from fastapi import APIRouter, Body, status
 
-from app.models import Book, Game, Movie
+from app.models import Book
 from app.logic import books_logic
 
 
@@ -40,7 +40,9 @@ async def add_book(book_data: Book = Body(embed=True)):
     return await books_logic.add_book(book_data)
 
 
-@router.delete("/remove_book/{book_name}")
+@router.delete(
+    "/remove_book/{book_name}", status_code=status.HTTP_202_ACCEPTED
+)
 async def remove_book(book_name: str):
     """
     removing book by name
@@ -48,8 +50,8 @@ async def remove_book(book_name: str):
     return await books_logic.remove_book(book_name)
 
 
-@router.put("/change_book")
-async def change_book():
+@router.patch("/change_book/{book_name}")
+async def change_book(book_name: str):
     """
     changing book fields (identifying by name)
     """

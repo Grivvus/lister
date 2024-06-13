@@ -2,7 +2,11 @@ from fastapi import HTTPException
 import pymongo
 
 from app.models import Book
-from app.logic.validation import validate_rate, validate_status
+from app.logic.validation import (
+    validate_rate,
+    validate_status,
+    validate_status_and_rate
+)
 
 
 async def get_all_books() -> list[Book]:
@@ -40,9 +44,14 @@ async def add_book(book_data: Book):
     or throws HTTPException if some data is incorrect
     """
     if not validate_status(book_data.status):
-        raise HTTPException(status_code=400, detail="wrong status")
+        raise HTTPException(status_code=422, detail="wrong status")
     if not validate_rate(book_data.rate):
-        raise HTTPException(status_code=400, detail="wrong rate")
+        raise HTTPException(status_code=422, detail="wrong rate")
+    if not validate_status_and_rate(book_data.status, book_data.rate):
+        raise HTTPException(
+            status_code=422,
+            detailt="you cannot rate book if you not finished it yet"
+        )
     new_book = Book(
         name=book_data.name,
         status=book_data.status,
