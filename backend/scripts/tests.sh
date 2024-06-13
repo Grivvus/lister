@@ -1,0 +1,1 @@
+pytest /app/app/tests/
