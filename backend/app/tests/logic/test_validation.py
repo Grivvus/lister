@@ -25,6 +25,7 @@ def test_validate_rate():
     assert validate_rate(0) is True
     assert validate_rate(11) is False
     assert validate_rate(3) is True
+    assert validate_rate(None) is True
 
 
 def test_validate_status_and_rate():

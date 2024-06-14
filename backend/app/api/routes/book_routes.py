@@ -1,4 +1,6 @@
-from fastapi import APIRouter, Body, status
+from typing import Annotated
+
+from fastapi import APIRouter, Body, Path, status
 
 from app.models import Book
 from app.logic import books_logic
@@ -50,9 +52,67 @@ async def remove_book(book_name: str):
     return await books_logic.remove_book(book_name)
 
 
-@router.patch("/change_book/{book_name}")
-async def change_book(book_name: str):
+@router.patch("/change_book_name/{book_name}")
+async def change_book_name(
+    book_name: Annotated[str, Path()],
+    new_book_name: Annotated[str, Body()]
+):
     """
-    changing book fields (identifying by name)
+
     """
-    raise NotImplementedError("not done yet")
+    raise NotImplementedError()
+
+
+@router.patch("/change_book_status'{book_name}")
+async def change_book_status(
+    book_name: Annotated[str, Path()],
+    new_book_status: Annotated[str, Body()]
+):
+    """
+
+    """
+    raise NotImplementedError()
+
+
+@router.path("/change_book_rate/{book_name}")
+async def change_book_rate(
+    book_name: Annotated[str, Path()],
+    new_book_rate: Annotated[int, Body()]
+):
+    """
+
+    """
+    raise NotImplementedError()
+
+
+@router.patch("/change_book_review{book_name}")
+async def change_book_review(
+    book_name: Annotated[str, Path()],
+    new_book_review: Annotated[str, Body()]
+):
+    """
+
+    """
+    raise NotImplementedError()
+
+
+@router.patch("/change_book_author/{book_name}")
+async def change_book_author(
+    book_name: Annotated[str, Path()],
+    new_book_author: Annotated[str, Body()]
+):
+    """
+
+    """
+    raise NotImplementedError()
+
+
+@router.patch("/change_book_genre/{book_name}")
+async def change_book_genre(
+    book_name: Annotated[str, Path()],
+    new_book_genre: Annotated[str, Body()]
+):
+    """
+
+    """
+    raise NotImplementedError()

@@ -5,7 +5,8 @@ from app.models import Book
 from app.logic.validation import (
     validate_rate,
     validate_status,
-    validate_status_and_rate
+    validate_status_and_rate,
+    validate_status_and_review
 )
 
 
@@ -30,10 +31,11 @@ async def pop_book():
         ).to_list()
         book = books_list[0]
     except IndexError:
+        # could probably return None, not raise exception
         raise HTTPException(status_code=400, detail="no books to pop")
 
     book.status = "in progress"
-    book.save()
+    await book.save()
 
     return book
 
@@ -43,15 +45,10 @@ async def add_book(book_data: Book):
     add new book to db
     or throws HTTPException if some data is incorrect
     """
-    if not validate_status(book_data.status):
-        raise HTTPException(status_code=422, detail="wrong status")
-    if not validate_rate(book_data.rate):
-        raise HTTPException(status_code=422, detail="wrong rate")
-    if not validate_status_and_rate(book_data.status, book_data.rate):
-        raise HTTPException(
-            status_code=422,
-            detailt="you cannot rate book if you not finished it yet"
-        )
+    validate_rate(book_data.rate)
+    validate_status(book_data.status)
+    validate_status_and_rate(book_data.status, book_data.rate)
+    validate_status_and_review(book_data.status, book_data.review)
     new_book = Book(
         name=book_data.name,
         status=book_data.status,
@@ -69,12 +66,13 @@ async def remove_book(book_name: str):
     """
     removes book from db or throws HTTPException if something goes wrong
     """
-    try:
-        await Book.find_one(Book.name == book_name).delete()
-    except Exception as e:
+    book = await Book.find_one(Book.name == book_name)
+    if book is not None:
+        await book.delete()
+    else:
         raise HTTPException(
             status_code=400,
-            detail=f"cannot remove book: exception {e}"
+            detail="Bad request: wrong book name"
         )
 
 

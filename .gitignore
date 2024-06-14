@@ -4,3 +4,4 @@ venv/
 .idea/
 *.html
 .env
+.coverage
