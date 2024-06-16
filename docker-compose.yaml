@@ -14,7 +14,7 @@ services:
       - ./backend:/app/
     depends_on:
       - mongodb
-    restart: on-failure
+    restart: no
 
   bot:
     build:
@@ -27,7 +27,7 @@ services:
     #   - ./tg_bot/.env 
     depends_on:
       - backend
-    restart: on-failure
+    restart: no
 
   mongodb:
     image: mongo
@@ -39,7 +39,7 @@ services:
     ports:
       - 27017:27017
 
-    restart: on-failure
+    restart: no
   
   mongo-express:
     image: mongo-express
