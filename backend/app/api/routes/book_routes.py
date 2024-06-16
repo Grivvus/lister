@@ -18,7 +18,7 @@ async def get_all_books():
 
 
 @router.get("/get_books_in_rate_order")
-def get_books_in_rate_order():
+async def get_books_in_rate_order():
     """
     returns all books where rate is not None
     in decreasing order of rate
