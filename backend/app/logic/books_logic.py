@@ -19,6 +19,13 @@ async def get_all_books() -> list[Book]:
     return books_list
 
 
+async def get_books_in_rate_order():
+    """
+
+    """
+    raise NotImplementedError()
+
+
 async def pop_book():
     """
     returns book that not read yet from top of list
@@ -32,7 +39,10 @@ async def pop_book():
         book = books_list[0]
     except IndexError:
         # could probably return None, not raise exception
-        raise HTTPException(status_code=400, detail="no books to pop")
+        raise HTTPException(
+            status_code=400,
+            detail="Bad request: no books to pop"
+        )
 
     book.status = "in progress"
     await book.save()
@@ -80,7 +90,24 @@ async def get_book_by_name(book_name: str):
     """
     find book by name and returns it
     """
-    return await Book.find_one(Book.name == book_name)
+    book = await Book.find_one(Book.name == book_name)
+    if book is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Bad request: no such book"
+        )
+
+    return book
+
+
+async def change_book_name(book_name: str, new_book_name: str):
+    """
+
+    """
+    book_to_change = await get_book_by_name(book_name)
+    book_to_change.name = new_book_name
+
+    return await book_to_change.save()
 
 
 async def change_book_status(book_name: str, new_status: str):
@@ -88,14 +115,11 @@ async def change_book_status(book_name: str, new_status: str):
     change book status or throws HTTPException
     if new status is incorrect
     """
-    validation_res = validate_status(new_status)
-    if not validation_res:
-        raise HTTPException(status_code=400, detail="wrong status")
-    else:
-        book_to_change = await get_book_by_name(book_name)
-        book_to_change.status = new_status
+    validate_status(new_status)
+    book_to_change = await get_book_by_name(book_name)
+    book_to_change.status = new_status
 
-        return await book_to_change.save()
+    return await book_to_change.save()
 
 
 async def change_book_rate(book_name: str, new_rate: int):
@@ -103,11 +127,40 @@ async def change_book_rate(book_name: str, new_rate: int):
     change book rate or throws HTTPException
     if new rate is incorrect
     """
-    validation_res = validate_rate(new_rate)
-    if not validation_res:
-        raise HTTPException(status_code=400, detail="wrong rate")
-    else:
-        book_to_change = await get_book_by_name(book_name)
-        book_to_change.rate = new_rate
+    validate_rate(new_rate)
+    book_to_change = await get_book_by_name(book_name)
+    validate_status_and_rate(book_to_change.status, new_rate)
+    book_to_change.rate = new_rate
 
-        return await book_to_change.save()
+    return await book_to_change.save()
+
+
+async def change_book_review(book_name: str, new_book_review: str):
+    """
+
+    """
+    book_to_change = await get_book_by_name(book_name)
+    validate_status_and_review(book_to_change.status, new_book_review)
+    book_to_change.review = new_book_review
+
+    return await book_to_change.save()
+
+
+async def change_book_author(book_name: str, new_book_author: str):
+    """
+
+    """
+    book_to_change = await get_book_by_name(book_name)
+    book_to_change.author = new_book_author
+
+    return await book_to_change.save()
+
+
+async def change_book_genre(book_name: str, new_book_genre: str):
+    """
+
+    """
+    book_to_change = await get_book_by_name(book_name)
+    book_to_change.book_genre = new_book_genre
+
+    return await book_to_change.save()
