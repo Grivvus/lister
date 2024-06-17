@@ -30,6 +30,7 @@ async def get_books_in_rate_order():
 async def pop_book():
     """
     returns book with highest rate that not read yet
+    and change it status to 'in progress'
     or raises HTTPExcetion with status code 400 is book is None
     """
     return await books_logic.pop_book()

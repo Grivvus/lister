@@ -21,7 +21,7 @@ async def get_all_books() -> list[Book]:
 
 async def get_books_in_rate_order():
     """
-
+    returns all books that have rate in descending order
     """
     raise NotImplementedError()
 
@@ -33,6 +33,8 @@ async def pop_book():
     or throws HTTPException
     """
     try:
+        # todo попробовать сделать, что б из базы сразу возвращался
+        # нужный элемент, а не весь список книг
         books_list = await Book.find(Book.status == "not started").sort(
             [(Book.add_time, pymongo.DESCENDING)]
         ).to_list()
@@ -72,21 +74,7 @@ async def add_book(book_data: Book):
     return await new_book.insert()
 
 
-async def remove_book(book_name: str):
-    """
-    removes book from db or throws HTTPException if something goes wrong
-    """
-    book = await Book.find_one(Book.name == book_name)
-    if book is not None:
-        await book.delete()
-    else:
-        raise HTTPException(
-            status_code=400,
-            detail="Bad request: wrong book name"
-        )
-
-
-async def get_book_by_name(book_name: str):
+async def get_book_by_name(book_name: str) -> Book:
     """
     find book by name and returns it
     """
@@ -100,9 +88,18 @@ async def get_book_by_name(book_name: str):
     return book
 
 
+async def remove_book(book_name: str):
+    """
+    removes book from db
+    or throws HTTPException if there's no such book
+    """
+    book = await get_book_by_name(book_name)
+    return await book.delete()
+
+
 async def change_book_name(book_name: str, new_book_name: str):
     """
-
+    change book name
     """
     book_to_change = await get_book_by_name(book_name)
     book_to_change.name = new_book_name
@@ -137,7 +134,7 @@ async def change_book_rate(book_name: str, new_rate: int):
 
 async def change_book_review(book_name: str, new_book_review: str):
     """
-
+    change book review or throws HTTPException
     """
     book_to_change = await get_book_by_name(book_name)
     validate_status_and_review(book_to_change.status, new_book_review)
@@ -148,7 +145,7 @@ async def change_book_review(book_name: str, new_book_review: str):
 
 async def change_book_author(book_name: str, new_book_author: str):
     """
-
+    change book author
     """
     book_to_change = await get_book_by_name(book_name)
     book_to_change.author = new_book_author
@@ -158,7 +155,7 @@ async def change_book_author(book_name: str, new_book_author: str):
 
 async def change_book_genre(book_name: str, new_book_genre: str):
     """
-
+    change book genre
     """
     book_to_change = await get_book_by_name(book_name)
     book_to_change.book_genre = new_book_genre

@@ -19,7 +19,7 @@ async def get_all_games() -> list[Game]:
 
 async def get_games_in_rate_order():
     """
-
+    returns all games that have rate in descending order
     """
     raise NotImplementedError()
 
@@ -114,7 +114,7 @@ async def change_game_status(game_name, new_status):
 
 async def change_game_rate(game_name, new_rate):
     """
-    change book status or throws HTTPException
+    change game status or throws HTTPException
     if new rate is incorrect
     """
     validat_rate(new_rate)
@@ -140,7 +140,7 @@ async def change_game_genre(game_name, new_genre):
     """
     change game genre
     """
-    game_to_change = get_game_by_name(game_name)
+    game_to_change = await get_game_by_name(game_name)
     game_to_change.game_genre = new_genre
 
     return await game_to_change.save()

@@ -35,7 +35,8 @@ async def pop_game():
 @router.post("/add_game")
 async def add_game(game_data: Game = Body(embed=True)):
     """
-    add new game to db
+    add new game to db or throws HTTPException
+    if some parameters are incorrect
     """
     return await games_logic.add_game(game_data)
 
@@ -43,7 +44,8 @@ async def add_game(game_data: Game = Body(embed=True)):
 @router.delete("/remove_game/{game_name}")
 async def remove_game(game_name: Annotated[str, Path()]):
     """
-    removing game by name
+    removing game by name or throws HTTPException
+    if there's no such game
     """
     return await games_logic.remove_game(game_name)
 
