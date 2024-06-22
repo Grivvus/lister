@@ -19,7 +19,7 @@ async def get_all_movies() -> list[Movie]:
 
 async def get_movies_in_rate_order():
     """
-    returns all movies that have rate in descending order
+
     """
     raise NotImplementedError()
 
@@ -80,6 +80,8 @@ async def get_movie_by_name(movie_name: str) -> Movie:
             status_code=400,
             detail="Bad request: no suck movie"
         )
+
+    return movie
 
 
 async def remove_movie(movie_name: str):
@@ -152,6 +154,6 @@ async def change_movie_director(movie_name, new_director):
     change movie director
     """
     movie_to_change = await get_movie_by_name(movie_name)
-    movie_to_change.director = new_director()
+    movie_to_change.director = new_director
 
     return await movie_to_change.save()

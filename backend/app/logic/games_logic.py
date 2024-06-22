@@ -80,6 +80,8 @@ async def get_game_by_name(game_name: str) -> Game:
             detail="Bad request: no suck game"
         )
 
+    return game
+
 
 async def remove_game(game_name: str):
     """
