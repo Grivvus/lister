@@ -15,7 +15,7 @@ user = settings.MONGO_INITDB_ROOT_USERNAME
 host = "mongodb"  # почему то только так подключается
 port = "27017"
 connection_string = f"mongodb://{user}:{password}@{host}:{port}"
-db_name = None
+db_name = settings.MONGO_DB_NAME
 
 
 def get_async_mongodb_client() -> AgnosticClient:
@@ -27,8 +27,10 @@ def get_async_mongodb_client() -> AgnosticClient:
 
 
 def get_async_mongodb_database() -> AgnosticDatabase:
+    global db_name
     client = get_async_mongodb_client()
-    db_name = "lister_db"
+    if db_name is None:
+        db_name = "lister_db"
     return client[db_name]
 
 

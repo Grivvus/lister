@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     )
     MONGO_INITDB_ROOT_USERNAME: str
     MONGO_INITDB_ROOT_PASSWORD: str
+    MONGO_DB_NAME: str
 
 
 settings = Settings()

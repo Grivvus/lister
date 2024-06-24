@@ -3,7 +3,7 @@ import pymongo
 
 from app.models import Game
 from app.logic.validation import (
-    validat_rate,
+    validate_rate,
     validate_status,
     validate_status_and_rate,
     validate_status_and_review,
@@ -53,7 +53,7 @@ async def add_game(game_data: Game):
     or throws HTTPException if some data incorrect
     """
     validate_status(game_data.status)
-    validat_rate(game_data.rate)
+    validate_rate(game_data.rate)
     validate_status_and_rate(game_data.status, game_data.rate)
     validate_status_and_review(game_data.status, game_data.review)
     new_game = Game(
@@ -119,7 +119,7 @@ async def change_game_rate(game_name, new_rate):
     change game status or throws HTTPException
     if new rate is incorrect
     """
-    validat_rate(new_rate)
+    validate_rate(new_rate)
     game_to_change = await get_game_by_name(game_name)
     validate_status_and_rate(game_to_change.status, new_rate)
     game_to_change.rate = new_rate

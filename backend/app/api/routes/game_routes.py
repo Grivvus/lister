@@ -8,7 +8,7 @@ from app.logic import games_logic
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/get_all_games")
 async def get_all_games():
     """
     returns all games in order of addition to db

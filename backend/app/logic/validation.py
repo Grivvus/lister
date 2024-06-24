@@ -12,7 +12,10 @@ def validate_rate(rate: int | None):
     rate is a number between 0 and 10
     """
     if rate is not None and (rate < 0 or rate > 10):
-        raise HTTPException(status_code=422, detail="wrong rate")
+        raise HTTPException(
+            status_code=422,
+            detail=f"wrong rate: {rate}. rate is >= 0 and <= 10"
+        )
 
 
 def validate_status_and_rate(status: str, rate: int | None):

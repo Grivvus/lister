@@ -3,7 +3,7 @@ import pymongo
 
 from app.models import Movie
 from app.logic.validation import (
-    validat_rate,
+    validate_rate,
     validate_status,
     validate_status_and_rate,
     validate_status_and_review,
@@ -53,7 +53,7 @@ async def add_movie(movie_data: Movie):
     or throws HTTPException if some data incorrect
     """
     validate_status(movie_data.status)
-    validat_rate(movie_data.rate)
+    validate_rate(movie_data.rate)
     validate_status_and_rate(movie_data.status, movie_data.rate)
     validate_status_and_review(movie_data.status, movie_data.review)
     new_movie = Movie(
@@ -120,7 +120,7 @@ async def change_movie_rate(movie_name, new_rate):
     change movie status or throws HTTPException
     if new rate is incorrect
     """
-    validat_rate(new_rate)
+    validate_rate(new_rate)
     movie_to_change = await get_movie_by_name(movie_name)
     validate_status_and_rate(movie_to_change.status, new_rate)
     movie_to_change.rate = new_rate

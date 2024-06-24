@@ -8,7 +8,7 @@ from app.logic import movies_logic
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/get_all_movies")
 async def get_all_movies():
     """
     returns all movies in order of addition to db

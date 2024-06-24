@@ -9,7 +9,7 @@ from app.logic import books_logic
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("/get_all_books")
 async def get_all_books():
     """
     returns all books
