@@ -21,7 +21,13 @@ async def get_games_in_rate_order():
     """
     returns all games that have rate in descending order
     """
-    raise NotImplementedError()
+    games_list = await Game.find(
+        Game.rate is not None
+    ).sort(
+        [(Game.rate, pymongo.DESCENDING)]
+    ).tolist()
+
+    return games_list
 
 
 async def pop_game():

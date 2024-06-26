@@ -23,7 +23,13 @@ async def get_books_in_rate_order():
     """
     returns all books that have rate in descending order
     """
-    raise NotImplementedError()
+    books_list = await Book.find(
+        Book.rate is not None
+    ).sort(
+        [(Book.rate, pymongo.DESCENDING)]
+    ).tolist()
+
+    return books_list
 
 
 async def pop_book():

@@ -19,9 +19,15 @@ async def get_all_movies() -> list[Movie]:
 
 async def get_movies_in_rate_order():
     """
-
+    returns list of movies that had rate in descending order
     """
-    raise NotImplementedError()
+    movies_list = await Movie.find(
+        Movie.rate is not None
+    ).sort(
+        [(Movie.rate, pymongo.DESCENDING)]
+    ).tolist()
+
+    return movies_list
 
 
 async def pop_movie():
