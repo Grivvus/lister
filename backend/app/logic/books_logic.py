@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 import pymongo
 
 from app.models import Book
@@ -32,28 +31,16 @@ async def get_books_in_rate_order():
     return books_list
 
 
-async def pop_book():
+async def pop_book() -> Book | None:
     """
     returns book that not read yet from top of list
-    and change book status to 'in progress'
-    or throws HTTPException
+    and change book status to 'in progress' if book exist
     """
-    try:
-        # todo попробовать сделать, что б из базы сразу возвращался
-        # нужный элемент, а не весь список книг
-        books_list = await Book.find(Book.status == "not started").sort(
-            [(Book.add_time, pymongo.DESCENDING)]
-        ).to_list()
-        book = books_list[0]
-    except IndexError:
-        # could probably return None, not raise exception
-        raise HTTPException(
-            status_code=400,
-            detail="Bad request: no books to pop"
-        )
+    book = await Book.find_one(Book.status == "not started")
 
-    book.status = "in progress"
-    await book.save()
+    if book is not None:
+        book.status = "in progress"
+        await book.save()
 
     return book
 
@@ -80,16 +67,11 @@ async def add_book(book_data: Book):
     return await new_book.insert()
 
 
-async def get_book_by_name(book_name: str) -> Book:
+async def get_book_by_name(book_name: str) -> Book | None:
     """
     find book by name and returns it
     """
     book = await Book.find_one(Book.name == book_name)
-    if book is None:
-        raise HTTPException(
-            status_code=400,
-            detail="Bad request: no such book"
-        )
 
     return book
 
@@ -97,73 +79,78 @@ async def get_book_by_name(book_name: str) -> Book:
 async def remove_book(book_name: str):
     """
     removes book from db
-    or throws HTTPException if there's no such book
     """
     book = await get_book_by_name(book_name)
-    return await book.delete()
+    if book is not None:
+        return await book.delete()
+    return None
 
 
 async def change_book_name(book_name: str, new_book_name: str):
     """
     change book name
     """
-    book_to_change = await get_book_by_name(book_name)
-    book_to_change.name = new_book_name
-
-    return await book_to_change.save()
+    book = await get_book_by_name(book_name)
+    if book is not None:
+        book.name = new_book_name
+        return await book.save()
+    return None
 
 
 async def change_book_status(book_name: str, new_status: str):
     """
-    change book status or throws HTTPException
-    if new status is incorrect
+    change book status
     """
     validate_status(new_status)
-    book_to_change = await get_book_by_name(book_name)
-    book_to_change.status = new_status
-
-    return await book_to_change.save()
+    book = await get_book_by_name(book_name)
+    if book is not None:
+        book.status = new_status
+        return await book.save()
+    return None
 
 
 async def change_book_rate(book_name: str, new_rate: int):
     """
-    change book rate or throws HTTPException
-    if new rate is incorrect
+    change book rate
     """
     validate_rate(new_rate)
-    book_to_change = await get_book_by_name(book_name)
-    validate_status_and_rate(book_to_change.status, new_rate)
-    book_to_change.rate = new_rate
-
-    return await book_to_change.save()
+    book = await get_book_by_name(book_name)
+    if book is not None:
+        validate_status_and_rate(book.status, new_rate)
+        book.rate = new_rate
+        return await book.save()
+    return None
 
 
 async def change_book_review(book_name: str, new_book_review: str):
     """
-    change book review or throws HTTPException
+    change book review
     """
-    book_to_change = await get_book_by_name(book_name)
-    validate_status_and_review(book_to_change.status, new_book_review)
-    book_to_change.review = new_book_review
-
-    return await book_to_change.save()
+    book = await get_book_by_name(book_name)
+    if book is not None:
+        validate_status_and_review(book.status, new_book_review)
+        book.review = new_book_review
+        return await book.save()
+    return None
 
 
 async def change_book_author(book_name: str, new_book_author: str):
     """
     change book author
     """
-    book_to_change = await get_book_by_name(book_name)
-    book_to_change.author = new_book_author
-
-    return await book_to_change.save()
+    book = await get_book_by_name(book_name)
+    if book is not None:
+        book.author = new_book_author
+        return await book.save()
+    return None
 
 
 async def change_book_genre(book_name: str, new_book_genre: str):
     """
     change book genre
     """
-    book_to_change = await get_book_by_name(book_name)
-    book_to_change.book_genre = new_book_genre
-
-    return await book_to_change.save()
+    book = await get_book_by_name(book_name)
+    if book is not None:
+        book.book_genre = new_book_genre
+        return await book.save()
+    return None

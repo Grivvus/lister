@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 import pymongo
 
 from app.models import Movie
@@ -30,26 +29,15 @@ async def get_movies_in_rate_order():
     return movies_list
 
 
-async def pop_movie():
+async def pop_movie() -> Movie | None:
     """
     returns movie that not played yet from top of to_list
-    and change movie status to 'in progress'
-    or throws HTTPException
+    and change movie status to 'in progress' if movie exist
     """
-    try:
-        movies_list = await Movie.find(Movie.status == "not started").sort(
-            [(Movie.add_time, pymongo.DESCENDING)]
-        ).to_list()
-        movie = movies_list[0]
-    except IndexError:
-        raise HTTPException(
-            status_code=400,
-            detail="Bad request: no movies to pop"
-        )
-
-    movie.status("in progress")
-    await movie.save()
-
+    movie = await Movie.find_one(Movie.status == "not started")
+    if movie is not None:
+        movie.status("in progress")
+        await movie.save()
     return movie
 
 
@@ -76,17 +64,11 @@ async def add_movie(movie_data: Movie):
     return await new_movie.insert()
 
 
-async def get_movie_by_name(movie_name: str) -> Movie:
+async def get_movie_by_name(movie_name: str) -> Movie | None:
     """
     search for movie by it's name
     """
     movie = await Movie.find_one(Movie.name == movie_name)
-    if movie is None:
-        raise HTTPException(
-            status_code=400,
-            detail="Bad request: no suck movie"
-        )
-
     return movie
 
 
@@ -96,17 +78,20 @@ async def remove_movie(movie_name: str):
     or throws HTTPException if there's no such movie
     """
     movie = await get_movie_by_name(movie_name)
-    return await movie.delete()
+    if movie is not None:
+        return await movie.delete()
+    return None
 
 
 async def change_movie_name(movie_name, new_movie_name):
     """
     change movie name
     """
-    movie_to_change = await get_movie_by_name(movie_name)
-    movie_to_change.name = new_movie_name
-
-    return await movie_to_change.save()
+    movie = await get_movie_by_name(movie_name)
+    if movie is not None:
+        movie.name = new_movie_name
+        return await movie.save()
+    return None
 
 
 async def change_movie_status(movie_name, new_status):
@@ -115,10 +100,11 @@ async def change_movie_status(movie_name, new_status):
     if status is incorrect
     """
     validate_status(new_status)
-    movie_to_change = await get_movie_by_name(movie_name)
-    movie_to_change.status = new_status
-
-    return await movie_to_change.save()
+    movie = await get_movie_by_name(movie_name)
+    if movie is not None:
+        movie.status = new_status
+        return await movie.save()
+    return None
 
 
 async def change_movie_rate(movie_name, new_rate):
@@ -127,39 +113,43 @@ async def change_movie_rate(movie_name, new_rate):
     if new rate is incorrect
     """
     validate_rate(new_rate)
-    movie_to_change = await get_movie_by_name(movie_name)
-    validate_status_and_rate(movie_to_change.status, new_rate)
-    movie_to_change.rate = new_rate
-
-    return await movie_to_change.save()
+    movie = await get_movie_by_name(movie_name)
+    if movie is not None:
+        validate_status_and_rate(movie.status, new_rate)
+        movie.rate = new_rate
+        return await movie.save()
+    return None
 
 
 async def change_movie_review(movie_name, new_reivew):
     """
-    change movie review or throws HTTPException
+    change movie review
     """
-    movie_to_change = await get_movie_by_name(movie_name)
-    validate_status_and_review(movie_to_change.status, new_reivew)
-    movie_to_change.review = new_reivew
-
-    return await movie_to_change.save()
+    movie = await get_movie_by_name(movie_name)
+    if movie is not None:
+        validate_status_and_review(movie.status, new_reivew)
+        movie.review = new_reivew
+        return await movie.save()
+    return None
 
 
 async def change_movie_genre(movie_name, new_genre):
     """
     change movie genre
     """
-    movie_to_change = await get_movie_by_name(movie_name)
-    movie_to_change.movie_genre = new_genre
-
-    return await movie_to_change.save()
+    movie = await get_movie_by_name(movie_name)
+    if movie is not None:
+        movie.movie_genre = new_genre
+        return await movie.save()
+    return None
 
 
 async def change_movie_director(movie_name, new_director):
     """
     change movie director
     """
-    movie_to_change = await get_movie_by_name(movie_name)
-    movie_to_change.director = new_director
-
-    return await movie_to_change.save()
+    movie = await get_movie_by_name(movie_name)
+    if movie is not None:
+        movie.director = new_director
+        return await movie.save()
+    return None

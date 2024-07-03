@@ -1,4 +1,3 @@
-from fastapi import HTTPException
 import pymongo
 
 from app.models import Game
@@ -36,17 +35,7 @@ async def pop_game():
     and change game status to 'in progress'
     or throws HTTPException
     """
-    try:
-        games_list = await Game.find(Game.status == "not started").sort(
-            [(Game.add_time, pymongo.DESCENDING)]
-        ).to_list()
-        game = games_list[0]
-    except IndexError:
-        raise HTTPException(
-            status_code=400,
-            detail="Bad request: no games to pop"
-        )
-
+    game = await Game.find_one(Game.status == "not started")
     game.status("in progress")
     await game.save()
 
@@ -75,17 +64,11 @@ async def add_game(game_data: Game):
     return await new_game.insert()
 
 
-async def get_game_by_name(game_name: str) -> Game:
+async def get_game_by_name(game_name: str) -> Game | None:
     """
     search for game by it's name
     """
     game = await Game.find_one(Game.name == game_name)
-    if game is None:
-        raise HTTPException(
-            status_code=400,
-            detail="Bad request: no suck game"
-        )
-
     return game
 
 
@@ -95,17 +78,20 @@ async def remove_game(game_name: str):
     or throws HTTPException if there's no such game
     """
     game = await get_game_by_name(game_name)
-    return await game.delete()
+    if game is not None:
+        return await game.delete()
+    return None
 
 
 async def change_game_name(game_name, new_game_name):
     """
     change game name
     """
-    game_to_change = await get_game_by_name(game_name)
-    game_to_change.name = new_game_name
-
-    return await game_to_change.save()
+    game = await get_game_by_name(game_name)
+    if game is not None:
+        game.name = new_game_name
+        return await game.save()
+    return None
 
 
 async def change_game_status(game_name, new_status):
@@ -114,10 +100,11 @@ async def change_game_status(game_name, new_status):
     if status is incorrect
     """
     validate_status(new_status)
-    game_to_change = await get_game_by_name(game_name)
-    game_to_change.status = new_status
-
-    return await game_to_change.save()
+    game = await get_game_by_name(game_name)
+    if game is not None:
+        game.status = new_status
+        return await game.save()
+    return None
 
 
 async def change_game_rate(game_name, new_rate):
@@ -126,29 +113,32 @@ async def change_game_rate(game_name, new_rate):
     if new rate is incorrect
     """
     validate_rate(new_rate)
-    game_to_change = await get_game_by_name(game_name)
-    validate_status_and_rate(game_to_change.status, new_rate)
-    game_to_change.rate = new_rate
-
-    return await game_to_change.save()
+    game = await get_game_by_name(game_name)
+    if game is not None:
+        validate_status_and_rate(game.status, new_rate)
+        game.rate = new_rate
+        return await game.save()
+    return None
 
 
 async def change_game_review(game_name, new_reivew):
     """
     change game review or throws HTTPException
     """
-    game_to_change = await get_game_by_name(game_name)
-    validate_status_and_review(game_to_change.status, new_reivew)
-    game_to_change.review = new_reivew
-
-    return await game_to_change.save()
+    game = await get_game_by_name(game_name)
+    if game is not None:
+        validate_status_and_review(game.status, new_reivew)
+        game.review = new_reivew
+        return await game.save()
+    return None
 
 
 async def change_game_genre(game_name, new_genre):
     """
     change game genre
     """
-    game_to_change = await get_game_by_name(game_name)
-    game_to_change.game_genre = new_genre
-
-    return await game_to_change.save()
+    game = await get_game_by_name(game_name)
+    if game is not None:
+        game.game_genre = new_genre
+        return await game.save()
+    return None
