@@ -12,7 +12,7 @@ app.include_router(api_router, prefix="/api")
 
 
 @app.on_event("startup")
-async def startup_event():
+async def startup_event() -> None:
     await start_async_mongodb()
 
 

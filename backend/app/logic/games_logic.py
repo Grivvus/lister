@@ -1,4 +1,5 @@
 import pymongo
+from pymongo.results import DeleteResult
 
 from app.models import Game
 from app.logic.validation import (
@@ -16,33 +17,33 @@ async def get_all_games() -> list[Game]:
     return await Game.find().to_list()
 
 
-async def get_games_in_rate_order():
+async def get_games_in_rate_order() -> list[Game]:
     """
     returns all games that have rate in descending order
     """
     games_list = await Game.find(
         Game.rate is not None
     ).sort(
-        [(Game.rate, pymongo.DESCENDING)]
-    ).tolist()
+        (Game.rate, pymongo.DESCENDING)
+    ).to_list()
 
     return games_list
 
 
-async def pop_game():
+async def pop_game() -> Game | None:
     """
     returns game that not played yet from top of to_list
     and change game status to 'in progress'
-    or throws HTTPException
     """
     game = await Game.find_one(Game.status == "not started")
-    game.status("in progress")
-    await game.save()
+    if game is not None:
+        game.status("in progress")
+        await game.save()
 
     return game
 
 
-async def add_game(game_data: Game):
+async def add_game(game_data: Game) -> Game:
     """
     add new game to db
     or throws HTTPException if some data incorrect
@@ -72,10 +73,9 @@ async def get_game_by_name(game_name: str) -> Game | None:
     return game
 
 
-async def remove_game(game_name: str):
+async def remove_game(game_name: str) -> DeleteResult | None:
     """
     removes game from db
-    or throws HTTPException if there's no such game
     """
     game = await get_game_by_name(game_name)
     if game is not None:
@@ -83,7 +83,7 @@ async def remove_game(game_name: str):
     return None
 
 
-async def change_game_name(game_name, new_game_name):
+async def change_game_name(game_name: str, new_game_name: str) -> Game | None:
     """
     change game name
     """
@@ -94,7 +94,7 @@ async def change_game_name(game_name, new_game_name):
     return None
 
 
-async def change_game_status(game_name, new_status):
+async def change_game_status(game_name: str, new_status: str) -> Game | None:
     """
     change game status or throws HTTPException
     if status is incorrect
@@ -107,7 +107,7 @@ async def change_game_status(game_name, new_status):
     return None
 
 
-async def change_game_rate(game_name, new_rate):
+async def change_game_rate(game_name: str, new_rate: int) -> Game | None:
     """
     change game status or throws HTTPException
     if new rate is incorrect
@@ -121,7 +121,7 @@ async def change_game_rate(game_name, new_rate):
     return None
 
 
-async def change_game_review(game_name, new_reivew):
+async def change_game_review(game_name: str, new_reivew: str) -> Game | None:
     """
     change game review or throws HTTPException
     """
@@ -133,7 +133,7 @@ async def change_game_review(game_name, new_reivew):
     return None
 
 
-async def change_game_genre(game_name, new_genre):
+async def change_game_genre(game_name: str, new_genre: str) -> Game | None:
     """
     change game genre
     """

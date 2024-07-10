@@ -1,4 +1,5 @@
 import pymongo
+from pymongo.results import DeleteResult
 
 from app.models import Book
 from app.logic.validation import (
@@ -18,15 +19,15 @@ async def get_all_books() -> list[Book]:
     return books_list
 
 
-async def get_books_in_rate_order():
+async def get_books_in_rate_order() -> list[Book]:
     """
     returns all books that have rate in descending order
     """
     books_list = await Book.find(
         Book.rate is not None
     ).sort(
-        [(Book.rate, pymongo.DESCENDING)]
-    ).tolist()
+        (Book.rate, pymongo.DESCENDING),
+    ).to_list()
 
     return books_list
 
@@ -45,7 +46,7 @@ async def pop_book() -> Book | None:
     return book
 
 
-async def add_book(book_data: Book):
+async def add_book(book_data: Book) -> Book:
     """
     add new book to db
     or throws HTTPException if some data is incorrect
@@ -76,7 +77,7 @@ async def get_book_by_name(book_name: str) -> Book | None:
     return book
 
 
-async def remove_book(book_name: str):
+async def remove_book(book_name: str) -> DeleteResult | None:
     """
     removes book from db
     """
@@ -86,7 +87,9 @@ async def remove_book(book_name: str):
     return None
 
 
-async def change_book_name(book_name: str, new_book_name: str):
+async def change_book_name(
+    book_name: str, new_book_name: str
+) -> Book | None:
     """
     change book name
     """
@@ -97,7 +100,9 @@ async def change_book_name(book_name: str, new_book_name: str):
     return None
 
 
-async def change_book_status(book_name: str, new_status: str):
+async def change_book_status(
+    book_name: str, new_status: str
+) -> Book | None:
     """
     change book status
     """
@@ -109,7 +114,7 @@ async def change_book_status(book_name: str, new_status: str):
     return None
 
 
-async def change_book_rate(book_name: str, new_rate: int):
+async def change_book_rate(book_name: str, new_rate: int) -> Book | None:
     """
     change book rate
     """
@@ -122,7 +127,9 @@ async def change_book_rate(book_name: str, new_rate: int):
     return None
 
 
-async def change_book_review(book_name: str, new_book_review: str):
+async def change_book_review(
+    book_name: str, new_book_review: str
+) -> Book | None:
     """
     change book review
     """
@@ -134,7 +141,9 @@ async def change_book_review(book_name: str, new_book_review: str):
     return None
 
 
-async def change_book_author(book_name: str, new_book_author: str):
+async def change_book_author(
+    book_name: str, new_book_author: str
+) -> Book | None:
     """
     change book author
     """
@@ -145,7 +154,9 @@ async def change_book_author(book_name: str, new_book_author: str):
     return None
 
 
-async def change_book_genre(book_name: str, new_book_genre: str):
+async def change_book_genre(
+    book_name: str, new_book_genre: str
+) -> Book | None:
     """
     change book genre
     """

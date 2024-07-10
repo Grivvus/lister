@@ -1,24 +1,23 @@
 import sys
 
 from beanie import init_beanie
-from motor.core import AgnosticClient, AgnosticDatabase
 
-from motor.motor_asyncio import AsyncIOMotorClient
+from motor.motor_asyncio import AsyncIOMotorClient, AsyncIOMotorDatabase
 
 from app.models import Book, Game, Movie
 from app.core.settings import settings
 
 
-async_mongodb_client: AgnosticClient | None = None
+async_mongodb_client: AsyncIOMotorClient | None = None
 password = settings.MONGO_INITDB_ROOT_PASSWORD
 user = settings.MONGO_INITDB_ROOT_USERNAME
-host = "mongodb"  # почему то только так подключается
+host = "mongodb"
 port = "27017"
 connection_string = f"mongodb://{user}:{password}@{host}:{port}"
 db_name = settings.MONGO_DB_NAME
 
 
-def get_async_mongodb_client() -> AgnosticClient:
+def get_async_mongodb_client() -> AsyncIOMotorClient:
     global async_mongodb_client
     if async_mongodb_client is None:
         async_mongodb_client = AsyncIOMotorClient(connection_string)
@@ -26,7 +25,7 @@ def get_async_mongodb_client() -> AgnosticClient:
     return async_mongodb_client
 
 
-def get_async_mongodb_database() -> AgnosticDatabase:
+def get_async_mongodb_database() -> AsyncIOMotorDatabase:
     global db_name
     client = get_async_mongodb_client()
     if db_name is None:
