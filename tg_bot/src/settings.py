@@ -12,6 +12,14 @@ class Settings(BaseSettings):
         extra="ignore"
     )
     BOT_TOKEN: str
+    BACKEND_PROTOCOL: str = 'http://'
+    BACKEND_DOMEN: str = 'backend'
+    BACKEND_PORT: str = '8000'
+    BACKEND_API_VERSION: str = '/api'
+    BACKEND_STRING: str = (
+        BACKEND_PROTOCOL + BACKEND_DOMEN + ':'
+        + BACKEND_PORT + BACKEND_API_VERSION
+    )
 
 
 settings = Settings()

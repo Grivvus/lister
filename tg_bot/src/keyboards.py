@@ -45,7 +45,7 @@ def get_first_level_inline_keyboard(type: str) -> InlineKeyboardBuilder:
     )
     builder.add(
         InlineKeyboardButton(
-            text="Весь список", callback_data=f"read_all_{type}"
+            text="Весь список", callback_data=f"get_all_{type}"
         )
     )
     builder.add(

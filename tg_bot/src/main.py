@@ -74,22 +74,22 @@ async def movies_handler(message: Message):
     )
 
 
-@dp.callback_query(F.data.endswith("book"))
+@dp.callback_query(F.data.endswith("books"))
 async def book_query_handler(callback: CallbackQuery):
     if callback.data.startswith("add"):
-        add_book_query(callback)
+        await add_book_query(callback)
     elif callback.data.startswith("change"):
-        change_book_query(callback)
+        await change_book_query(callback)
     elif callback.data.startswith("del"):
-        del_book_query(callback)
-    elif callback.data.startswith("read_all"):
-        read_all_book_query(callback)
+        await del_book_query(callback)
+    elif callback.data.startswith("get_all"):
+        await get_all_books_query(callback)
     elif callback.data.startswith("pop"):
-        pop_book_query(callback)
+        await pop_book_query(callback)
     else:
         await callback.message.edit_text("unkown command")
 
-    await callback.answer()
+    await callback.answer("response is over")
 
 
 @dp.callback_query(F.data.endswith("game"))
@@ -100,8 +100,8 @@ async def game_query_handler(callback: CallbackQuery):
         change_game_query(callback)
     elif callback.data.startswith("del"):
         del_game_query(callback)
-    elif callback.data.startswith("read_all"):
-        read_all_game_query(callback)
+    elif callback.data.startswith("get_all"):
+        get_all_game_query(callback)
     elif callback.data.startswith("pop"):
         pop_game_query(callback)
     else:
@@ -118,8 +118,8 @@ async def movie_query_handler(callback: CallbackQuery):
         change_movie_query(callback)
     elif callback.data.startswith("del"):
         del_movie_query(callback)
-    elif callback.data.startswith("read_all"):
-        read_all_movie_query(callback)
+    elif callback.data.startswith("get_all"):
+        get_all_movie_query(callback)
     elif callback.data.startswith("pop"):
         pop_movie_query(callback)
     else:
