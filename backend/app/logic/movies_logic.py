@@ -73,14 +73,14 @@ async def get_movie_by_name(movie_name: str) -> Movie | None:
     return movie
 
 
-async def remove_movie(movie_name: str) -> DeleteResult | None:
+async def remove_movie(movie_name: str) -> None:
     """
     removes movie from db
     or throws HTTPException if there's no such movie
     """
     movie = await get_movie_by_name(movie_name)
     if movie is not None:
-        return await movie.delete()
+        await movie.delete()
     return None
 
 

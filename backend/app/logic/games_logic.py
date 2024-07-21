@@ -73,13 +73,13 @@ async def get_game_by_name(game_name: str) -> Game | None:
     return game
 
 
-async def remove_game(game_name: str) -> DeleteResult | None:
+async def remove_game(game_name: str) -> None:
     """
     removes game from db
     """
     game = await get_game_by_name(game_name)
     if game is not None:
-        return await game.delete()
+        await game.delete()
     return None
 
 

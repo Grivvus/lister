@@ -67,7 +67,7 @@ async def change_book_name(
     return await books_logic.change_book_name(book_name, new_book_name)
 
 
-@router.patch("/change_book_status'{book_name}")
+@router.patch("/change_book_status/{book_name}")
 async def change_book_status(
     book_name: Annotated[str, Path()],
     new_book_status: Annotated[str, Body()]

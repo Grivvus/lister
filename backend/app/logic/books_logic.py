@@ -77,13 +77,13 @@ async def get_book_by_name(book_name: str) -> Book | None:
     return book
 
 
-async def remove_book(book_name: str) -> DeleteResult | None:
+async def remove_book(book_name: str) -> None:
     """
     removes book from db
     """
     book = await get_book_by_name(book_name)
     if book is not None:
-        return await book.delete()
+        await book.delete()
     return None
 
 
