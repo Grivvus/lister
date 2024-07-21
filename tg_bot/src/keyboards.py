@@ -1,5 +1,6 @@
 from aiogram.types import (
-    ReplyKeyboardMarkup, KeyboardButton,
+    ReplyKeyboardMarkup,
+    KeyboardButton,
     InlineKeyboardButton
 )
 from aiogram.utils.keyboard import InlineKeyboardBuilder
@@ -29,19 +30,13 @@ def get_first_level_inline_keyboard(type: str) -> InlineKeyboardBuilder:
     """
     builder = InlineKeyboardBuilder()
     builder.add(
-        InlineKeyboardButton(
-            text="Добавить", callback_data=f"add_{type}"
-        )
+        InlineKeyboardButton(text="Добавить", callback_data=f"add_{type}")
     )
     builder.add(
-        InlineKeyboardButton(
-            text="Изменить", callback_data=f"change_{type}"
-        )
+        InlineKeyboardButton(text="Изменить", callback_data=f"change_{type}")
     )
     builder.add(
-        InlineKeyboardButton(
-            text="Удалить", callback_data=f"del_{type}"
-        )
+        InlineKeyboardButton(text="Удалить", callback_data=f"del_{type}")
     )
     builder.add(
         InlineKeyboardButton(
@@ -49,9 +44,7 @@ def get_first_level_inline_keyboard(type: str) -> InlineKeyboardBuilder:
         )
     )
     builder.add(
-        InlineKeyboardButton(
-            text="Взять сверху", callback_data=f"pop_{type}"
-        )
+        InlineKeyboardButton(text="Взять сверху", callback_data=f"pop_{type}")
     )
 
     builder.adjust(3)

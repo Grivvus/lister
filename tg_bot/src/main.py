@@ -6,8 +6,8 @@ from aiogram import Bot, Dispatcher, F
 from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 
+import callback_queries
 from constants import WELCOME_TEXT, HELP_TEXT
-from callback_queries import *
 from keyboards import make_kb_for_start, get_first_level_inline_keyboard
 from settings import settings
 
@@ -21,9 +21,7 @@ async def start_handler(message: Message):
     """
 
     await message.answer(text=WELCOME_TEXT)
-    await message.answer(
-        "what's your target", reply_markup=make_kb_for_start()
-    )
+    await message.answer("what's your target", reply_markup=make_kb_for_start())
 
 
 @dp.message(Command("help", ignore_case=True))
@@ -77,17 +75,17 @@ async def movies_handler(message: Message):
 @dp.callback_query(F.data.endswith("books"))
 async def book_query_handler(callback: CallbackQuery):
     if callback.data.startswith("add"):
-        await add_book_query(callback)
+        await callback_queries.add_book_query(callback)
     elif callback.data.startswith("change"):
-        await change_book_query(callback)
+        await callback_queries.change_book_query(callback)
     elif callback.data.startswith("del"):
-        await del_book_query(callback)
+        await callback_queries.del_book_query(callback)
     elif callback.data.startswith("get_all"):
-        await get_all_books_query(callback)
+        await callback_queries.get_all_books_query(callback)
     elif callback.data.startswith("pop"):
-        await pop_book_query(callback)
+        await callback_queries.pop_book_query(callback)
     else:
-        await callback.message.edit_text("unkown command")
+        callback.message.edit_text("unkown command")
 
     await callback.answer("response is over")
 
@@ -95,15 +93,15 @@ async def book_query_handler(callback: CallbackQuery):
 @dp.callback_query(F.data.endswith("game"))
 async def game_query_handler(callback: CallbackQuery):
     if callback.data.startswith("add"):
-        add_game_query(callback)
+        await callback_queries.add_game_query(callback)
     elif callback.data.startswith("change"):
-        change_game_query(callback)
+        await callback_queries.change_game_query(callback)
     elif callback.data.startswith("del"):
-        del_game_query(callback)
+        await callback_queries.del_game_query(callback)
     elif callback.data.startswith("get_all"):
-        get_all_game_query(callback)
+        await callback_queries.get_all_game_query(callback)
     elif callback.data.startswith("pop"):
-        pop_game_query(callback)
+        await callback_queries.pop_game_query(callback)
     else:
         await callback.message.edit_text("unkown command")
 
@@ -113,15 +111,15 @@ async def game_query_handler(callback: CallbackQuery):
 @dp.callback_query(F.data.endswith("movie"))
 async def movie_query_handler(callback: CallbackQuery):
     if callback.data.startswith("add"):
-        add_movie_query(callback)
+        await callback_queries.add_movie_query(callback)
     elif callback.data.startswith("change"):
-        change_movie_query(callback)
+        await callback_queries.change_movie_query(callback)
     elif callback.data.startswith("del"):
-        del_movie_query(callback)
+        await callback_queries.del_movie_query(callback)
     elif callback.data.startswith("get_all"):
-        get_all_movie_query(callback)
+        await callback_queries.get_all_movie_query(callback)
     elif callback.data.startswith("pop"):
-        pop_movie_query(callback)
+        await callback_queries.pop_movie_query(callback)
     else:
         await callback.message.edit_text("unkown command")
 
