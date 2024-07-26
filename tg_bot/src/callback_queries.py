@@ -1,5 +1,7 @@
 from aiogram.types import CallbackQuery
+from aiogram.fsm.context import FSMContext
 
+import fsm
 from requests_ import (
     book_requests,
     game_requests,
@@ -9,10 +11,12 @@ import utils
 
 
 # start book segment
-async def add_book_query(callback: CallbackQuery): ...
-
-
-async def change_book_query(callback: CallbackQuery): ...
+async def add_book_query(callback: CallbackQuery, state: FSMContext):
+    await state.set_state(fsm.BookEnterState.enter_book_name)
+    await callback.message.answer(
+        "Добавьте все необходимые данные для добавления книги"
+    )
+    await callback.message.answer("Введите имя книги:")
 
 
 async def remove_book_query(callback: CallbackQuery):
@@ -43,9 +47,6 @@ async def pop_book_query(callback: CallbackQuery):
 async def add_game_query(callback: CallbackQuery): ...
 
 
-async def change_game_query(callback: CallbackQuery): ...
-
-
 async def remove_game_query(callback: CallbackQuery): ...
 
 
@@ -57,9 +58,6 @@ async def pop_game_query(callback: CallbackQuery): ...
 
 # start movie segment
 async def add_movie_query(callback: CallbackQuery): ...
-
-
-async def change_movie_query(callback: CallbackQuery): ...
 
 
 async def remove_movie_query(callback: CallbackQuery): ...

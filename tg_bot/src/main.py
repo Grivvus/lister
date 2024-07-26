@@ -2,131 +2,15 @@ import asyncio
 import logging
 import sys
 
-from aiogram import Bot, Dispatcher, F
-from aiogram.filters import Command
-from aiogram.types import Message, CallbackQuery
+from aiogram import Bot, Dispatcher
 
-import callback_queries
-from constants import WELCOME_TEXT, HELP_TEXT
-from keyboards import make_kb_for_start, get_first_level_inline_keyboard
+import handlers
 from settings import settings
-
-dp = Dispatcher()
-
-
-@dp.message(Command("start", ignore_case=True))
-async def start_handler(message: Message):
-    """
-    print welcom message and help text in user chat
-    """
-
-    await message.answer(text=WELCOME_TEXT)
-    await message.answer("what's your target", reply_markup=make_kb_for_start())
-
-
-@dp.message(Command("help", ignore_case=True))
-async def command_start_handler(message: Message):
-    """
-    print help texte in user chat
-    """
-
-    await message.answer(text=HELP_TEXT)
-
-
-@dp.message(Command("books", ignore_case=True))
-async def books_handler(message: Message):
-    """
-    docs will be here
-    """
-    builder_kb = get_first_level_inline_keyboard("books")
-
-    await message.answer(
-        "Какое действие вы хотите произвести?",
-        reply_markup=builder_kb.as_markup()
-    )
-
-
-@dp.message(Command("games", ignore_case=True))
-async def games_handler(message: Message):
-    """
-    docs will be here
-    """
-    builder_kb = get_first_level_inline_keyboard("games")
-
-    await message.answer(
-        "Какое действие вы хотите произвести?",
-        reply_markup=builder_kb.as_markup()
-    )
-
-
-@dp.message(Command("movies", ignore_case=True))
-async def movies_handler(message: Message):
-    """
-    docs will be here
-    """
-    builder_kb = get_first_level_inline_keyboard("movies")
-
-    await message.answer(
-        "Какое действие вы хотите произвести?",
-        reply_markup=builder_kb.as_markup()
-    )
-
-
-@dp.callback_query(F.data.endswith("books"))
-async def book_query_handler(callback: CallbackQuery):
-    if callback.data.startswith("add"):
-        await callback_queries.add_book_query(callback)
-    elif callback.data.startswith("change"):
-        await callback_queries.change_book_query(callback)
-    elif callback.data.startswith("del"):
-        await callback_queries.del_book_query(callback)
-    elif callback.data.startswith("get_all"):
-        await callback_queries.get_all_books_query(callback)
-    elif callback.data.startswith("pop"):
-        await callback_queries.pop_book_query(callback)
-    else:
-        callback.message.edit_text("unkown command")
-
-    await callback.answer("response is over")
-
-
-@dp.callback_query(F.data.endswith("game"))
-async def game_query_handler(callback: CallbackQuery):
-    if callback.data.startswith("add"):
-        await callback_queries.add_game_query(callback)
-    elif callback.data.startswith("change"):
-        await callback_queries.change_game_query(callback)
-    elif callback.data.startswith("del"):
-        await callback_queries.del_game_query(callback)
-    elif callback.data.startswith("get_all"):
-        await callback_queries.get_all_game_query(callback)
-    elif callback.data.startswith("pop"):
-        await callback_queries.pop_game_query(callback)
-    else:
-        await callback.message.edit_text("unkown command")
-
-    await callback.answer()
-
-
-@dp.callback_query(F.data.endswith("movie"))
-async def movie_query_handler(callback: CallbackQuery):
-    if callback.data.startswith("add"):
-        await callback_queries.add_movie_query(callback)
-    elif callback.data.startswith("change"):
-        await callback_queries.change_movie_query(callback)
-    elif callback.data.startswith("del"):
-        await callback_queries.del_movie_query(callback)
-    elif callback.data.startswith("get_all"):
-        await callback_queries.get_all_movie_query(callback)
-    elif callback.data.startswith("pop"):
-        await callback_queries.pop_movie_query(callback)
-    else:
-        await callback.message.edit_text("unkown command")
-
-    await callback.answer()
 
 
 async def main():
+    dp = Dispatcher()
+    dp.include_router(handlers.r)
     bot = Bot(settings.BOT_TOKEN)
 
     await dp.start_polling(bot)

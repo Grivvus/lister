@@ -50,3 +50,18 @@ def get_first_level_inline_keyboard(type: str) -> InlineKeyboardBuilder:
     builder.adjust(3)
 
     return builder
+
+
+def get_possible_statuses_keyboard() -> ReplyKeyboardMarkup:
+    kb = [
+        [KeyboardButton(text="not started")],
+        [KeyboardButton(text="in progress")],
+        [KeyboardButton(text="finished")],
+    ]
+
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=kb, resize_keyboard=True,
+        input_field_placeholder="what's book status?"
+    )
+
+    return keyboard
