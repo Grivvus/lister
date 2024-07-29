@@ -3,11 +3,14 @@ from aiogram.fsm.state import StatesGroup
 
 
 class BookEnterState(StatesGroup):
-    start_state = State()
-    enter_book_name = State()
-    enter_book_author = State()
-    enter_book_genre = State()
-    enter_book_status = State()
-    enter_book_rate = State()
-    enter_book_review = State()
+    enter_name = State()
+    enter_author = State()
+    enter_genre = State()
+    enter_status = State()
+    enter_rate = State()
+    enter_review = State()
     is_ready = State()
+
+
+class BookDeleteState(StatesGroup):
+    enter_name = State()

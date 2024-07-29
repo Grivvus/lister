@@ -1,3 +1,5 @@
+from typing import Any
+
 import requests
 
 from settings import settings
@@ -66,21 +68,22 @@ class Requests:
         """
         response = requests.delete(
             self.connection_string +
-            f"/delete_{self.instance_name}/{name}"
+            f"/remove_{self.instance_name}/{name}"
         )
         if response.status_code != 200:
             return False
         return True
 
-    def add_instance(self, instance_data: dict) -> dict | None:
+    def add_instance(self, instance_data: dict[str, Any]) -> dict | None:
         """
         send request to add item of 'instance' to db
         if addition was succesfull returns added objest
         otherwise returns None
         """
+        print({f"{self.instance_name}_data": instance_data})
         response = requests.post(
             url=self.connection_string + f"/add_{self.instance_name}",
-            data={f"{self.instance_name}_data": instance_data}
+            json=instance_data
         )
         if response.status_code != 200:
             return None

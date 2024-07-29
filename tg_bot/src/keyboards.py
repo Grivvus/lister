@@ -15,6 +15,7 @@ def make_kb_for_start() -> ReplyKeyboardMarkup:
         [KeyboardButton(text="/Games")],
         [KeyboardButton(text="/Movies")],
         [KeyboardButton(text="/help")],
+        [KeyboardButton(text="/clear")]
     ]
 
     keyboard = ReplyKeyboardMarkup(
@@ -62,6 +63,29 @@ def get_possible_statuses_keyboard() -> ReplyKeyboardMarkup:
     keyboard = ReplyKeyboardMarkup(
         keyboard=kb, resize_keyboard=True,
         input_field_placeholder="what's book status?"
+    )
+
+    return keyboard
+
+
+def get_possible_rate() -> ReplyKeyboardMarkup:
+    kb = [
+        [KeyboardButton(text="0")],
+        [KeyboardButton(text="1")],
+        [KeyboardButton(text="2")],
+        [KeyboardButton(text="3")],
+        [KeyboardButton(text="4")],
+        [KeyboardButton(text="5")],
+        [KeyboardButton(text="6")],
+        [KeyboardButton(text="7")],
+        [KeyboardButton(text="8")],
+        [KeyboardButton(text="9")],
+        [KeyboardButton(text="10")]
+    ]
+
+    keyboard = ReplyKeyboardMarkup(
+        keyboard=kb, resize_keyboad=True,
+        input_field_placeholder="what's your rate of this book"
     )
 
     return keyboard

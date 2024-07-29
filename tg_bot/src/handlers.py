@@ -9,8 +9,10 @@ import fsm
 from constants import WELCOME_TEXT, HELP_TEXT
 from keyboards import (
     make_kb_for_start, get_first_level_inline_keyboard,
-    get_possible_statuses_keyboard
+    get_possible_statuses_keyboard, get_possible_rate
 )
+from requests_ import book_requests
+import utils
 
 r = Router()
 
@@ -34,6 +36,12 @@ async def command_start_handler(message: Message):
     """
 
     await message.answer(text=HELP_TEXT)
+
+
+@r.message(Command("clear"))
+async def clear_state(message: Message, state: FSMContext):
+    await state.clear()
+    await message.answer("Состояние сброшено")
 
 
 @r.message(Command("books", ignore_case=True))
@@ -75,12 +83,12 @@ async def movies_handler(message: Message):
     )
 
 
-@r.callback_query(F.data.endswith("books"), StateFilter(default_state))
+@r.callback_query(F.data.endswith("books"))
 async def book_query_handler(callback: CallbackQuery, state: FSMContext):
     if callback.data.startswith("add"):
         await callback_queries.add_book_query(callback, state)
     if callback.data.startswith("del"):
-        await callback_queries.del_book_query(callback)
+        await callback_queries.remove_book_query(callback, state)
     elif callback.data.startswith("get_all"):
         await callback_queries.get_all_books_query(callback)
     elif callback.data.startswith("pop"):
@@ -96,7 +104,7 @@ async def game_query_handler(callback: CallbackQuery):
     if callback.data.startswith("add"):
         await callback_queries.add_game_query(callback)
     elif callback.data.startswith("del"):
-        await callback_queries.del_game_query(callback)
+        await callback_queries.remove_game_query(callback)
     elif callback.data.startswith("get_all"):
         await callback_queries.get_all_game_query(callback)
     elif callback.data.startswith("pop"):
@@ -112,7 +120,7 @@ async def movie_query_handler(callback: CallbackQuery):
     if callback.data.startswith("add"):
         await callback_queries.add_movie_query(callback)
     elif callback.data.startswith("del"):
-        await callback_queries.del_movie_query(callback)
+        await callback_queries.remove_movie_query(callback)
     elif callback.data.startswith("get_all"):
         await callback_queries.get_all_movie_query(callback)
     elif callback.data.startswith("pop"):
@@ -123,61 +131,94 @@ async def movie_query_handler(callback: CallbackQuery):
     await callback.answer()
 
 
-@r.message(fsm.BookEnterState.enter_book_name)
+@r.message(fsm.BookEnterState.enter_name)
 async def add_book_author(message: Message, state: FSMContext):
+    await state.update_data(name=message.text)
     await message.answer("Отлично, теперь введи автора книги")
-    await state.set_state(fsm.BookEnterState.enter_book_author)
+    await state.set_state(fsm.BookEnterState.enter_author)
 
 
-@r.message(fsm.BookEnterState.enter_book_author)
+@r.message(fsm.BookEnterState.enter_author)
 async def add_book_genre(message: Message, state: FSMContext):
+    await state.update_data(author=message.text)
     await message.answer("Так, теперь время ввести жанр книги")
     await message.answer(
-        "Если ты не знаешь жанр, просто отправь пустое сообщение"
+        "Если ты не знаешь жанр, просто отправь '-'"
     )
-    await state.set_state(fsm.BookEnterState.enter_book_genre)
+    await state.set_state(fsm.BookEnterState.enter_genre)
 
 
-@r.message(fsm.BookEnterState.enter_book_genre)
+@r.message(fsm.BookEnterState.enter_genre)
 async def add_book_status(message: Message, state: FSMContext):
+    await state.update_data(book_genre=message.text.lower())
     await message.answer(
         "отлично, теперь выбери статус книги",
         reply_markup=get_possible_statuses_keyboard(),
     )
-    await state.set_state(fsm.BookEnterState.enter_book_status)
+    await state.set_state(fsm.BookEnterState.enter_status)
 
 
 @r.message(
-    fsm.BookEnterState.enter_book_status,
+    fsm.BookEnterState.enter_status,
     F.text.in_(["not started", "in progress"])
 )
-async def add_book_rate(message: Message, state: FSMContext):
+async def add_book_finished_state(message: Message, state: FSMContext):
+    await state.update_data(status=message.text)
     await message.answer("значит больше данных от тебя не требуется")
-    await state.set_state(fsm.BookEnterState.is_ready)
+
+    current_data = await state.get_data()
+    final_data = utils.prepair_insert_data_to_request(current_data)
+    if book_requests.add_instance(final_data) is not None:
+        await message.answer("Вы добавили книгу:")
+        await message.answer(final_data.__str__())
+    else:
+        await message.answer("Что-то пошло не так")
+
+    await state.clear()
 
 
 @r.message(
-    fsm.BookEnterState.enter_book_status,
+    fsm.BookEnterState.enter_status,
     F.text.in_(["finished"])
 )
-async def add_book_finished_state(message: Message, state: FSMContext):
+async def add_book_rate(message: Message, state: FSMContext):
+    await state.update_data(status=message.text)
     await message.answer("значит надо еще добавить некоторые данные")
-    await state.set_state(fsm.BookEnterState.enter_book_rate)
+    await message.answer(
+        "какую бы вы оценку поставили книге (от 0 до 10)",
+        reply_markup=get_possible_rate()
+    )
+    await state.set_state(fsm.BookEnterState.enter_rate)
 
 
-@r.message(fsm.BookEnterState.enter_book_rate)
+@r.message(fsm.BookEnterState.enter_rate)
 async def add_book_review(message: Message, state: FSMContext):
-    await state.set_state(fsm.BookEnterState.enter_book_review)
-    await message.answer("Напишите небольшой отзык на эту книгу")
+    await state.update_data(rate=message.text)
+    await state.set_state(fsm.BookEnterState.enter_review)
+    await message.answer("Напишите небольшой отзыв на эту книгу")
 
 
-@r.message(fsm.BookEnterState.enter_book_review)
+@r.message(fsm.BookEnterState.enter_review)
 async def mark_book_as_ready(message: Message, state: FSMContext):
-    await state.set_state(fsm.BookEnterState.is_ready)
+    await state.update_data(review=message.text)
+
+    current_data = await state.get_data()
+    final_data = utils.prepair_insert_data_to_request(current_data)
+    if book_requests.add_instance(final_data) is not None:
+        await message.answer("Вы добавили книгу:")
+        await message.answer(final_data.__str__())
+    else:
+        await message.answer("Что-то пошло не так")
+
+    await state.clear()
 
 
-@r.message(fsm.BookEnterState.is_ready)
-async def send_book_request(message: Message, state: FSMContext):
-    await message.answer("Вы добавили книгу:")
-    curr_state = await state.get_data()
-    await message.answer(curr_state.__str__())
+@r.message(fsm.BookDeleteState.enter_name)
+async def delete_book(message: Message, state: FSMContext):
+    if book_requests.remove_instance(message.text):
+        await message.answer("Книга успешно удалена")
+    else:
+        await message.answer(
+            "Не удалось удалить книгу, проверьте корректность имени"
+        )
+    await state.clear()
