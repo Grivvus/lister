@@ -59,7 +59,7 @@ async def add_game(game_data: Game) -> Game:
         review=game_data.review,
         add_time=game_data.add_time,
         change_time=game_data.change_time,
-        game_genre=game_data.game_genre
+        genre=game_data.genre
     )
 
     return await new_game.insert()
@@ -139,6 +139,6 @@ async def change_game_genre(game_name: str, new_genre: str) -> Game | None:
     """
     game = await get_game_by_name(game_name)
     if game is not None:
-        game.game_genre = new_genre
+        game.genre = new_genre
         return await game.save()
     return None

@@ -63,7 +63,7 @@ async def add_book(book_data: Book) -> Book:
         add_time=book_data.add_time,
         change_time=book_data.change_time,
         author=book_data.author,
-        book_genre=book_data.book_genre
+        genre=book_data.genre
     )
     return await new_book.insert()
 
@@ -155,13 +155,13 @@ async def change_book_author(
 
 
 async def change_book_genre(
-    book_name: str, new_book_genre: str
+    book_name: str, new_genre: str
 ) -> Book | None:
     """
     change book genre
     """
     book = await get_book_by_name(book_name)
     if book is not None:
-        book.book_genre = new_book_genre
+        book.genre = new_genre
         return await book.save()
     return None

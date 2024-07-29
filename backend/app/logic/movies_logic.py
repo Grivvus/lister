@@ -58,7 +58,7 @@ async def add_movie(movie_data: Movie) -> Movie:
         review=movie_data.review,
         add_time=movie_data.add_time,
         change_time=movie_data.change_time,
-        movie_genre=movie_data.movie_genre,
+        genre=movie_data.genre,
         director=movie_data.director
     )
 
@@ -146,7 +146,7 @@ async def change_movie_genre(movie_name: str, new_genre: str) -> Movie | None:
     """
     movie = await get_movie_by_name(movie_name)
     if movie is not None:
-        movie.movie_genre = new_genre
+        movie.genre = new_genre
         return await movie.save()
     return None
 
