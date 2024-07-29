@@ -33,7 +33,7 @@ async def pop_movie():
 
 
 @router.post("/add_movie")
-async def add_movie(movie_data: Movie = Body(embed=True)):
+async def add_movie(movie_data: Annotated[Movie, Body()]):
     """
     add new movie to db
     """

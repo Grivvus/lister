@@ -37,7 +37,7 @@ async def pop_book() -> Book | None:
 
 
 @router.post("/add_book")
-async def add_book(book_data: Book = Body(embed=True)) -> Book | None:
+async def add_book(book_data: Annotated[Book, Body()]) -> Book | None:
     """
     add new book to db or raises HTTPExcetion
     with status_code 422

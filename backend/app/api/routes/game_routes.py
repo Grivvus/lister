@@ -33,7 +33,7 @@ async def pop_game():
 
 
 @router.post("/add_game")
-async def add_game(game_data: Game = Body(embed=True)):
+async def add_game(game_data: Annotated[Game, Body()]):
     """
     add new game to db or throws HTTPException
     if some parameters are incorrect
