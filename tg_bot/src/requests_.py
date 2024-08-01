@@ -80,7 +80,7 @@ class Requests:
         if addition was succesfull returns added objest
         otherwise returns None
         """
-        print({f"{self.instance_name}_data": instance_data})
+        print(instance_data)
         response = requests.post(
             url=self.connection_string + f"/add_{self.instance_name}",
             json=instance_data

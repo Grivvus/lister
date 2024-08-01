@@ -1,7 +1,6 @@
 from aiogram import Router, F
 from aiogram.fsm.context import FSMContext
-from aiogram.fsm.state import default_state
-from aiogram.filters import Command, StateFilter
+from aiogram.filters import Command
 from aiogram.types import Message, CallbackQuery
 
 import callback_queries
@@ -11,7 +10,9 @@ from keyboards import (
     make_kb_for_start, get_first_level_inline_keyboard,
     get_possible_statuses_keyboard, get_possible_rate
 )
-from requests_ import book_requests
+from requests_ import (
+    book_requests, game_requests, movie_requests
+)
 import utils
 
 r = Router()
@@ -100,13 +101,13 @@ async def book_query_handler(callback: CallbackQuery, state: FSMContext):
 
 
 @r.callback_query(F.data.endswith("games"))
-async def game_query_handler(callback: CallbackQuery):
+async def game_query_handler(callback: CallbackQuery, state: FSMContext):
     if callback.data.startswith("add"):
-        await callback_queries.add_game_query(callback)
+        await callback_queries.add_game_query(callback, state)
     elif callback.data.startswith("del"):
-        await callback_queries.remove_game_query(callback)
+        await callback_queries.remove_game_query(callback, state)
     elif callback.data.startswith("get_all"):
-        await callback_queries.get_all_game_query(callback)
+        await callback_queries.get_all_games_query(callback)
     elif callback.data.startswith("pop"):
         await callback_queries.pop_game_query(callback)
     else:
@@ -116,13 +117,13 @@ async def game_query_handler(callback: CallbackQuery):
 
 
 @r.callback_query(F.data.endswith("movies"))
-async def movie_query_handler(callback: CallbackQuery):
+async def movie_query_handler(callback: CallbackQuery, state: FSMContext):
     if callback.data.startswith("add"):
-        await callback_queries.add_movie_query(callback)
+        await callback_queries.add_movie_query(callback, state)
     elif callback.data.startswith("del"):
-        await callback_queries.remove_movie_query(callback)
+        await callback_queries.remove_movie_query(callback, state)
     elif callback.data.startswith("get_all"):
-        await callback_queries.get_all_movie_query(callback)
+        await callback_queries.get_all_movies_query(callback)
     elif callback.data.startswith("pop"):
         await callback_queries.pop_movie_query(callback)
     else:
@@ -150,9 +151,9 @@ async def add_book_genre(message: Message, state: FSMContext):
 
 @r.message(fsm.BookEnterState.enter_genre)
 async def add_book_status(message: Message, state: FSMContext):
-    await state.update_data(book_genre=message.text.lower())
+    await state.update_data(genre=message.text.lower())
     await message.answer(
-        "отлично, теперь выбери статус книги",
+        "Отлично, теперь выбери статус книги",
         reply_markup=get_possible_statuses_keyboard(),
     )
     await state.set_state(fsm.BookEnterState.enter_status)
@@ -164,7 +165,7 @@ async def add_book_status(message: Message, state: FSMContext):
 )
 async def add_book_finished_state(message: Message, state: FSMContext):
     await state.update_data(status=message.text)
-    await message.answer("значит больше данных от тебя не требуется")
+    await message.answer("Значит, больше данных от тебя не требуется")
 
     current_data = await state.get_data()
     final_data = utils.prepair_insert_data_to_request(current_data)
@@ -183,9 +184,9 @@ async def add_book_finished_state(message: Message, state: FSMContext):
 )
 async def add_book_rate(message: Message, state: FSMContext):
     await state.update_data(status=message.text)
-    await message.answer("значит надо еще добавить некоторые данные")
+    await message.answer("Значит, надо еще добавить некоторые данные")
     await message.answer(
-        "какую бы вы оценку поставили книге (от 0 до 10)",
+        text="Какую бы вы оценку поставили книге? (от 0 до 10)",
         reply_markup=get_possible_rate()
     )
     await state.set_state(fsm.BookEnterState.enter_rate)
@@ -213,6 +214,159 @@ async def mark_book_as_ready(message: Message, state: FSMContext):
     await state.clear()
 
 
+@r.message(fsm.GameEnterState.enter_name)
+async def add_game_genre(message: Message, state: FSMContext):
+    await state.update_data(name=message.text)
+    await message.answer("Теперь напиши жанр игры")
+    await message.answer("Если не знаешь жанр, просто отправь '-'")
+    await state.set_state(fsm.GameEnterState.enter_genre)
+
+
+@r.message(fsm.GameEnterState.enter_genre)
+async def add_game_status(message: Message, state: FSMContext):
+    await state.update_data(genre=message.text)
+    await message.answer(
+        text="Отлично, теперь выбери статус игры",
+        reply_markup=get_possible_statuses_keyboard(),
+    )
+    await state.set_state(fsm.GameEnterState.enter_status)
+
+
+@r.message(
+    fsm.GameEnterState.enter_status,
+    F.text.in_(["not started", "in progress"])
+)
+async def add_game_finished_state(message: Message, state: FSMContext):
+    await state.update_data(status=message.text)
+    await message.answer("Значит, больше данных от тебя не требуется")
+
+    current_data = await state.get_data()
+    final_data = utils.prepair_insert_data_to_request(current_data)
+    if game_requests.add_instance(final_data) is not None:
+        await message.answer("Вы добавили игры:")
+        await message.answer(final_data.__str__())
+    else:
+        await message.answer("Что-то пошло не так")
+
+    await state.clear()
+
+
+@r.message(
+    fsm.GameEnterState.enter_status,
+    F.text.in_(["finished"])
+)
+async def add_game_rate(message: Message, state: FSMContext):
+    await state.update_data(status=message.text)
+    await message.answer("Значит, надо еще добавить некоторые данные")
+    await message.answer(
+        text="Какую бы оценку вы поставили игре? (от 0 до 10)",
+        reply_markup=get_possible_rate()
+    )
+    await state.set_state(fsm.GameEnterState.enter_rate)
+
+
+@r.message(fsm.GameEnterState.enter_rate)
+async def add_game_review(message: Message, state: FSMContext):
+    await state.update_data(rate=message.text)
+    await message.answer("Напишите небольшой отзыва на эту игру")
+    await state.set_state(fsm.GameEnterState.enter_review)
+
+
+@r.message(fsm.GameEnterState.enter_review)
+async def mark_game_as_ready(message: Message, state: FSMContext):
+    await state.update_data(review=message.text)
+
+    current_data = await state.get_data()
+    final_data = utils.prepair_insert_data_to_request(current_data)
+    if game_requests.add_instance(final_data) is not None:
+        await message.answer("Вы добавили игру:")
+        await message.answer(final_data.__str__())
+    else:
+        await message.answer("Что-то пошло не так")
+
+    await state.clear()
+
+
+@r.message(fsm.MovieEnterState.enter_name)
+async def add_movie_director(message: Message, state: FSMContext):
+    await state.update_data(name=message.text)
+    await message.answer("Отлично, теперь введи имя режиссера фильма")
+    await state.set_state(fsm.MovieEnterState.enter_director)
+
+
+@r.message(fsm.MovieEnterState.enter_director)
+async def add_movie_genre(message: Message, state: FSMContext):
+    await state.update_data(director=message.text)
+    await message.answer("Теперь введи жанр фильма")
+    await message.answer("Если ты не знаешь жанр, просто отправь '-'")
+    await state.set_state(fsm.MovieEnterState.enter_genre)
+
+
+@r.message(fsm.MovieEnterState.enter_genre)
+async def add_movie_status(message: Message, state: FSMContext):
+    await state.update_data(genre=message.text)
+    await message.answer(
+        text="Отлично, теперь выбери статус фильма",
+        reply_markup=get_possible_statuses_keyboard(),
+    )
+    await state.set_state(fsm.MovieEnterState.enter_status)
+
+
+@r.message(
+    fsm.MovieEnterState.enter_status,
+    F.text.in_(["not started", "in progress"])
+)
+async def add_movie_finished_state(message: Message, state: FSMContext):
+    await state.update_data(status=message.text)
+    await message.answer("Значит, больше данных от тебя не требуется")
+
+    current_data = await state.get_data()
+    final_data = utils.prepair_insert_data_to_request(current_data)
+    if movie_requests.add_instance(final_data) is not None:
+        await message.answer("Вы добавили фильм:")
+        await message.answer(final_data.__str__())
+    else:
+        await message.answer("Что-то пошло не так")
+
+    await state.clear()
+
+
+@r.message(
+    fsm.MovieEnterState.enter_status,
+    F.text.in_(["finished"])
+)
+async def add_movie_rate(message: Message, state: FSMContext):
+    await state.update_data(status=message.text)
+    await message.answer("Значит, надо добавить еще некоторые данные")
+    await message.answer(
+        text="Какую бы вы оценку поставили фильму? (от 0 до 10)",
+        reply_markup=get_possible_rate()
+    )
+    await state.set_state(fsm.MovieEnterState.enter_rate)
+
+
+@r.message(fsm.MovieEnterState.enter_rate)
+async def add_movie_review(message: Message, state: FSMContext):
+    await state.update_data(rate=message.text)
+    await message.answer("Напишите небольшой отзыва на фильм")
+    await state.set_state(fsm.MovieEnterState.enter_review)
+
+
+@r.message(fsm.MovieEnterState.enter_review)
+async def mark_movie_as_ready(message: Message, state: FSMContext):
+    await state.update_data(reivew=message.text)
+
+    current_data = await state.get_data()
+    final_data = utils.prepair_insert_data_to_request(current_data)
+    if movie_requests.add_instance(final_data) is not None:
+        await message.answer("Вы добавили фильм")
+        await message.answer(final_data.__str__())
+    else:
+        await message.answer("Что-то пошло не так")
+
+    await state.clear()
+
+
 @r.message(fsm.BookDeleteState.enter_name)
 async def delete_book(message: Message, state: FSMContext):
     if book_requests.remove_instance(message.text):
@@ -220,5 +374,27 @@ async def delete_book(message: Message, state: FSMContext):
     else:
         await message.answer(
             "Не удалось удалить книгу, проверьте корректность имени"
+        )
+    await state.clear()
+
+
+@r.message(fsm.GameDeleteState.enter_name)
+async def delete_game(message: Message, state: FSMContext):
+    if game_requests.remove_instance(message.text):
+        await message.answer("Игра успешно удалена")
+    else:
+        await message.answer(
+            "Не удалось удалить игру, проверьте корректность имени"
+        )
+    await state.clear()
+
+
+@r.message(fsm.MovieDeleteState.enter_name)
+async def delete_movie(message: Message, state: FSMContext):
+    if movie_requests.remove_instance(message.text):
+        await message.answer("Фильм успешно удален")
+    else:
+        await message.answer(
+            "Не удалось удалить фильм, проверьте корректность имени"
         )
     await state.clear()
