@@ -15,18 +15,18 @@ def test_positive_validate_status():
 
 
 def test_negative_validate_status():
-    with pytest.raises(HTTPException) as e:
+    with pytest.raises(HTTPException) as exc:
         validate_status("alkdjfd")
-        assert e.status_code == 422
-        assert e.detail == "wrong status"
-    with pytest.raises(HTTPException) as e:
+        assert exc.status_code == 422
+        assert exc.detail == "wrong status"
+    with pytest.raises(HTTPException) as exc:
         validate_status("inprogress")
-        assert e.status_code == 422
-        assert e.detail == "wrong status"
-    with pytest.raises(HTTPException) as e:
+        assert exc.status_code == 422
+        assert exc.detail == "wrong status"
+    with pytest.raises(HTTPException) as exc:
         validate_status("IN PROGRESS")
-        assert e.status_code == 422
-        assert e.detail == "wrong status"
+        assert exc.status_code == 422
+        assert exc.detail == "wrong status"
 
 
 def test_validate_rate():
@@ -35,14 +35,14 @@ def test_validate_rate():
     validate_rate(3)
     validate_rate(None)
 
-    with pytest.raises(HTTPException) as e:
+    with pytest.raises(HTTPException) as exc:
         validate_rate(-1)
-        assert e.status_code == 422
-        assert e.detail == f"wrond rate: {-1} rate is >= 0 and <= 10"
+        assert exc.status_code == 422
+        assert exc.detail == f"wrong rate: {-1} rate is >= 0 and <= 10"
 
-    with pytest.raises(HTTPException) as e:
+    with pytest.raises(HTTPException) as exc:
         validate_rate(11)
-        assert e.status_code == 422
+        assert exc.status_code == 422
 
 
 def test_validate_status_and_rate():
@@ -50,10 +50,10 @@ def test_validate_status_and_rate():
     validate_status_and_rate("in progress", None)
     validate_status_and_rate("finished", 5)
 
-    with pytest.raises(HTTPException) as e:
+    with pytest.raises(HTTPException) as exc:
         validate_status_and_rate("not started", 2)
-        assert e.status_code == 422
+        assert exc.status_code == 422
 
-    with pytest.raises(HTTPException) as e:
+    with pytest.raises(HTTPException) as exc:
         validate_status_and_rate("in progress", 2)
-        assert e.status_code == 422
+        assert exc.status_code == 422

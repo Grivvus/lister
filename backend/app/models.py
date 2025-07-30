@@ -1,5 +1,5 @@
-from typing import Annotated
 import datetime
+from typing import Annotated
 
 from beanie import Document, Indexed
 
@@ -10,7 +10,7 @@ class GenericItem(Document):
     """
     name: Annotated[str, Indexed()]
     genre: str
-    status: str  # надо бы сделать типо enum [not_sarted, in_progress, finished] smth like that
+    status: str
     rate: int | None
     review: str | None
     add_time: datetime.datetime

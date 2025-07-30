@@ -3,7 +3,6 @@ from fastapi import FastAPI
 from app.api.main import api_router
 from app.core.db import start_async_mongodb
 
-
 app = FastAPI(
         debug=True, title="lister",
         docs_url="/", version="0.1.0",
