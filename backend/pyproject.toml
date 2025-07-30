@@ -1,24 +1,60 @@
-[tool.poetry]
+[project]
 name = "lister-backend"
 version = "0.1.0"
 description = "backend api for the lister project"
 authors = ["Arseniy Krupchik <kruchik.a04@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "beanie>=2.0.0",
+    "fastapi>=0.116.1",
+    "motor>=3.7.1",
+    "pydantic-settings>=2.10.1",
+    "uvicorn>=0.35.0",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-beanie = "^1.26.0"
-fastapi = {extras = ["standard"], version = "^0.115.2"}
-motor = "^3.4.0"
-pydantic-settings = "^2.2.1"
-uvicorn = "^0.30.1"
+[tool.mypy]
+plugins = "pydantic.mypy"
+python_version = "3.12"
 
-[tool.poetry.group.dev.dependencies]
-mimesis = "^13.1.0"
-httpx = "^0.27.0"
-pytest = "^7.4.4"
+[tool.ruff]
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".pyenv",
+    ".pytest_cache",
+    ".ruff_cache",
+    ".venv",
+    "venv",
+    "tests"
+]
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+target-version = "py312"
+
+indent-width = 4
+
+[tool.ruff.lint]
+select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28.1",
+    "mimesis>=18.0.0",
+    "mypy>=1.17.0",
+    "pytest>=8.4.1",
+    "wemake-python-styleguide>=1.3.0",
+]

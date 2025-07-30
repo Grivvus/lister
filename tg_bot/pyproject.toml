@@ -1,23 +1,21 @@
-[tool.poetry]
+[project]
 name = "lister-tg-bot"
 version = "0.1.0"
 description = "telegram bot for the lister project"
 authors = ["Arseniy Krupchik <kruchik.a04@gmail.com>"]
 license = "MIT"
 readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiogram>=3.21.0",
+    "pydantic>=2.11.7",
+    "pydantic-settings>=2.10.1",
+    "requests>=2.32.4",
+]
 
-[tool.poetry.dependencies]
-python = "^3.12"
-pydantic = "^2.7.3"
-aiogram = "^3.7.0"
-requests = "^2.32.3"
-pydantic-settings = "^2.3.0"
-
-
-[tool.poetry.group.dev.dependencies]
-pytest = "^8.2.1"
-mypy = "^1.11.0"
-
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[dependency-groups]
+dev = [
+    "mypy>=1.17.0",
+    "pytest>=8.4.1",
+    "requests>=2.32.4",
+]

@@ -1,15 +1,18 @@
-FROM python:3.12-bookworm
+FROM python:3.13-slim-bookworm
 
 WORKDIR /app
 
-RUN apt-get update  && apt-get install -y --no-install-recommends git
-RUN curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/poetry python && \
-    cd /usr/local/bin && \
-    ln -s /opt/poetry/bin/poetry && \
-    poetry config virtualenvs.create false
+RUN apt-get update && apt-get install -y --no-install-recommends git curl
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
 
 ENV PYTHONPATH=/app
 
-COPY . /app/
+COPY pyproject.toml /app/
+COPY uv.lock /app/
 
-RUN poetry install --no-root
+RUN uv pip install \
+    --system \
+    --no-cache \
+    --requirement /app/pyproject.toml
+
+COPY . /app/
